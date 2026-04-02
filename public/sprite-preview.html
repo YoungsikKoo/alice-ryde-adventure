@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<title>Sprite Preview</title>
+<style>
+body{background:#1a1a2e;color:#fff;font-family:'Courier New',monospace;padding:20px}
+h1{color:#ff69b4;text-align:center}
+h2{color:#f0d060;margin-top:24px;border-bottom:1px solid #333;padding-bottom:4px}
+.grid{display:flex;flex-wrap:wrap;gap:16px;margin:12px 0}
+.char{background:#2a2a3e;border:1px solid #444;border-radius:4px;padding:12px;text-align:center;width:120px}
+.char canvas{display:block;margin:4px auto;image-rendering:pixelated;image-rendering:crisp-edges}
+.char .name{color:#f0d060;font-size:11px;margin-top:4px}
+.char .frame{color:#888;font-size:9px}
+.scale4{width:64px;height:64px}
+.scale2{width:32px;height:32px}
+#log{color:#f44;font-size:11px;margin-top:12px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<h1>Alice's Ryde Adventure - Sprite Preview</h1>
+<div id="log"></div>
+
+<h2>Main Characters (4x scale)</h2>
+<div class="grid" id="chars"></div>
+
+<h2>Enemies (4x scale)</h2>
+<div class="grid" id="enemies"></div>
+
+<h2>All Frames - Alice (4x scale)</h2>
+<div class="grid" id="alice-frames"></div>
+
+<script src="js/engine/CharacterSprites.js"></script>
+<script>
+const log = document.getElementById('log');
+try {
+  CharacterSprites.init();
+  log.textContent = 'CharacterSprites.init() OK! Cache keys: ' + Object.keys(CharacterSprites._cache).length;
+  log.style.color = '#50c878';
+} catch(e) {
+  log.textContent = 'ERROR: ' + e.message + '\n' + e.stack;
+}
+
+const chars = ['alice','rinka','tara','yuri','mom','fafa'];
+const enemies = ['cockroach','pigeon','cockatoo','binChicken','bugSwarm','dogPoo','rat','crow','rexDog','wushuMaster','wushuMonster','cinemaPhantom'];
+const dirs = ['d','u','r'];
+const frames = [0,1];
+
+function drawSprite(container, type, dir, frame, sideView, scale) {
+  const cv = document.createElement('canvas');
+  cv.width = 64; cv.height = 64;
+  cv.style.width = scale + 'px';
+  cv.style.height = scale + 'px';
+  cv.style.imageRendering = 'pixelated';
+  const ctx = cv.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  const dirName = dir === 'd' ? 'down' : dir === 'u' ? 'up' : dir === 'r' ? 'right' : 'left';
+  const ok = CharacterSprites.draw(ctx, type, 0, 0, 64, 64, dirName, frame, sideView);
+
+  if (!ok) {
+    ctx.fillStyle = '#f44';
+    ctx.font = '8px monospace';
+    ctx.fillText('MISSING', 4, 32);
+  }
+
+  const div = document.createElement('div');
+  div.className = 'char';
+  div.appendChild(cv);
+
+  const name = document.createElement('div');
+  name.className = 'name';
+  name.textContent = type;
+  div.appendChild(name);
+
+  const fLabel = document.createElement('div');
+  fLabel.className = 'frame';
+  fLabel.textContent = (sideView ? 'sr' : dirName) + ' f' + frame;
+  div.appendChild(fLabel);
+
+  container.appendChild(div);
+}
+
+// Main chars - down facing
+const charGrid = document.getElementById('chars');
+for (const c of chars) {
+  drawSprite(charGrid, c, 'd', 0, false, 96);
+}
+
+// Enemies - down facing
+const enemyGrid = document.getElementById('enemies');
+for (const e of enemies) {
+  drawSprite(enemyGrid, e, 'd', 0, false, 96);
+}
+
+// Alice all frames
+const aliceGrid = document.getElementById('alice-frames');
+for (const d of ['d','u','r']) {
+  for (const f of [0,1]) {
+    drawSprite(aliceGrid, 'alice', d, f, false, 80);
+  }
+}
+// Side view
+drawSprite(aliceGrid, 'alice', 'r', 0, true, 80);
+drawSprite(aliceGrid, 'alice', 'r', 1, true, 80);
+// Left (flipped)
+const cvL = document.createElement('canvas');
+cvL.width = 64; cvL.height = 64;
+cvL.style.width = '80px'; cvL.style.height = '80px';
+cvL.style.imageRendering = 'pixelated';
+const ctxL = cvL.getContext('2d');
+ctxL.imageSmoothingEnabled = false;
+CharacterSprites.draw(ctxL, 'alice', 0, 0, 64, 64, 'left', 0, false);
+const divL = document.createElement('div');
+divL.className = 'char';
+divL.appendChild(cvL);
+const nl = document.createElement('div'); nl.className='name'; nl.textContent='alice';
+const fl = document.createElement('div'); fl.className='frame'; fl.textContent='left f0';
+divL.appendChild(nl); divL.appendChild(fl);
+aliceGrid.appendChild(divL);
+</script>
+</body></html>
