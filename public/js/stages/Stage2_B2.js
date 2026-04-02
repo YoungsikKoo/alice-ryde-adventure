@@ -736,26 +736,20 @@ class Stage2_B2 {
 
   _onBossDefeated() {
     this.bossDefeated = true;
+    this.complete = true;
     this.game.hud.clearBoss();
     this.game.hud.addChatMessage("Giant Scorpion defeated! Exit ahead!", "#50c878");
     this.game.startDialogue([
       { speaker: "Alice", text: "Finally! That was TERRIFYING!" },
       { speaker: "Alice", text: "I need to get out of this parking garage!" },
       { speaker: "Alice", text: "Stairs to B1 should be ahead!" }
-    ]);
+    ], function() {
+      if (this.game.transition) this.game.transition.startFade(function() { if (this.onComplete) this.onComplete(); }.bind(this));
+      else if (this.onComplete) this.onComplete();
+    }.bind(this));
   }
 
   _checkExit() {
-    if (this.complete) return;
-    var p = this.game.localPlayer;
-    if (this.bossDefeated && p.x > 4150) {
-      this.complete = true;
-      this.game.startDialogue([
-        { speaker: "Alice", text: "Up the stairs! Out of B2!" }
-      ], function() {
-        if (this.onComplete) this.onComplete("b1");
-      }.bind(this));
-    }
   }
 
   _updateAmbient(dt) {

@@ -1046,6 +1046,7 @@ class Stage2_B1 {
     }
     if (mainDead && friendsDead) {
       this.bossDefeated = true;
+      this.complete = true;
       this.game.hud.clearBoss();
       this.game.hud.addChatMessage("Karen defeated! Peace restored to Woolies!", "#50c878");
       this.game.startDialogue([
@@ -1055,21 +1056,14 @@ class Stage2_B1 {
         { speaker: "Alice", text: "Ma'am, zero isn't an option." },
         { speaker: "KAREN", text: "*faints dramatically*" },
         { speaker: "Alice", text: "Time to get out of Woolies!" }
-      ]);
+      ], function() {
+        if (this.game.transition) this.game.transition.startFade(function() { if (this.onComplete) this.onComplete(); }.bind(this));
+        else if (this.onComplete) this.onComplete();
+      }.bind(this));
     }
   }
 
   _checkExit() {
-    if (this.complete) return;
-    var p = this.game.localPlayer;
-    if (this.bossDefeated && p.x > 4350) {
-      this.complete = true;
-      this.game.startDialogue([
-        { speaker: "Alice", text: "Finally out of Wool-WORSE! Up to Ground Floor!" }
-      ], function() {
-        if (this.onComplete) this.onComplete("gf");
-      }.bind(this));
-    }
   }
 
   /* ===================== RENDER ===================== */

@@ -25,8 +25,27 @@ class Stage2{
     }
     if(sub==="b1"){
       this.currentSub=new Stage2_B1((next)=>{
+        this._loadSub(game,"1f");
+      });
+      this.currentSub.init(game);
+    }
+    if(sub==="1f"){
+      this.currentSub=new Stage2_1F((next)=>{
+        this._loadSub(game,"2f");
+      });
+      this.currentSub.init(game);
+    }
+    if(sub==="2f"){
+      this.currentSub=new Stage2_2F((next)=>{
+        this._loadSub(game,"3f");
+      });
+      this.currentSub.init(game);
+    }
+    if(sub==="3f"){
+      this.currentSub=new Stage2_3F((next)=>{
         if(game.sound)game.sound.stopBGM();
-        game.hud.addChatMessage("Stage 2 Complete! More coming soon!","#50c878");
+        this.complete=true;
+        game.loadStage(new Stage3());
       });
       this.currentSub.init(game);
     }

@@ -471,33 +471,24 @@ class Stage1_Sub4{
     const cloneDead=!this.bossClone||!this.bossClone.alive||this.bossClone.hp<=0;
     if(mainDead&&cloneDead){
       this.bossDefeated=true;
+      this.complete=true;
       this.game.hud.clearBoss();
-      this.game.hud.addChatMessage("Master Chen is defeated! The park is safe!","#50c878");
+      this.game.hud.addChatMessage("Master Chen is defeated!","#50c878");
       this.game.startDialogue([
         {speaker:"MASTER CHEN",text:"\u2669 ... \u6211\u8f93\u4e86... good fight... \u2669"},
         {speaker:"Alice",text:"Are you okay sir?"},
         {speaker:"MASTER CHEN",text:"You fight well... take my robe. I go home now."},
         {speaker:"Alice",text:"That was the weirdest park visit ever."},
-        {speaker:"Alice",text:"Time to head to Top Ryde City!"}
-      ]);
-    }
-  }
-
-  /* --- exit to Stage 2 --- */
-  _checkExit(){
-    if(this.complete||!this.bossDefeated)return;
-    const p=this.game.localPlayer;
-    const Z=Stage1_Sub4.ZONES;
-    const dx=p.x-Z.exitX*16, dy=p.y-Z.exitY*16;
-    if(Math.sqrt(dx*dx+dy*dy)<28){
-      this.complete=true;
-      this.game.startDialogue([
-        {speaker:"Alice",text:"Through the park! Top Ryde City here I come!"}
+        {speaker:"Alice",text:"Top Ryde City here I come!"}
       ],()=>{
-        if(this.onComplete)this.onComplete("stage2");
+        if(this.game.transition)this.game.transition.startFade(()=>{if(this.onComplete)this.onComplete("stage2")});
+        else if(this.onComplete)this.onComplete("stage2");
       });
     }
   }
+
+  /* --- exit to Stage 2 (auto-progress now) --- */
+  _checkExit(){}
 
   /* --- ambient --- */
   _updateAmbient(dt){

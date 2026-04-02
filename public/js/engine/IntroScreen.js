@@ -18,22 +18,22 @@ class IntroScreen{
       this._stars.push({x:Math.random()*480,y:Math.random()*320,s:1+Math.random()*2,spd:0.3+Math.random()*0.4});
     }
     this.chars=[
-      {name:"Alice",type:"alice",color:"#ff69b4",
+      {name:"Alice",type:"alice",color:"#ff69b4",attackStyle:"punch",
        desc:["12yo Korean girl","Brave & determined","Balanced stats"],
        stats:{hp:100,atk:10,def:5,speed:2.2}},
-      {name:"Rinka",type:"rinka",color:"#40bfa0",
+      {name:"Rinka",type:"rinka",color:"#40bfa0",attackStyle:"kick",
        desc:["12yo half-AUS/JP","Sporty & fast","High speed, low def"],
        stats:{hp:90,atk:9,def:4,speed:2.6}},
-      {name:"Tara",type:"tara",color:"#8b5cf6",
+      {name:"Tara",type:"tara",color:"#8b5cf6",attackStyle:"kick",
        desc:["12yo Central Asian","Mysterious & strong","High atk, low speed"],
        stats:{hp:95,atk:13,def:5,speed:2.0}},
-      {name:"Yuri",type:"yuri",color:"#4a90d9",
+      {name:"Yuri",type:"yuri",color:"#4a90d9",attackStyle:"punch",
        desc:["15yo Korean sister","Cool & protective","High def, balanced"],
        stats:{hp:110,atk:10,def:7,speed:2.1}},
-      {name:"Mom",type:"mom",color:"#e8c098",
+      {name:"Mom",type:"mom",color:"#e8c098",attackStyle:"punch",
        desc:["Korean mother","Kind & powerful","High HP, high atk"],
        stats:{hp:130,atk:12,def:6,speed:1.9}},
-      {name:"FaFa",type:"fafa",color:"#f0d060",
+      {name:"FaFa",type:"fafa",color:"#f0d060",attackStyle:"kick",
        desc:["Korean grandpa","Wise & tough","Highest def, slow"],
        stats:{hp:120,atk:8,def:9,speed:1.8}}
     ];
