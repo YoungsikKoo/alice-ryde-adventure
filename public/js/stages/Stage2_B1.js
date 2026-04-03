@@ -129,7 +129,7 @@ class FruitRat extends Enemy {
       enemyType: "fruitRat",
       name: c.name || "Fruit Thief Rat",
       hp: c.hp || 22,
-      atk: c.atk || 6,
+      atk: c.atk || 7,
       def: c.def || 1,
       speed: c.speed || 2.6,
       color: "#8b6914",
@@ -162,8 +162,8 @@ class ZombieGuard extends Enemy {
       enemyType: "zombieGuard",
       name: c.name || "Zombie Guard",
       hp: c.hp || 55,
-      atk: c.atk || 12,
-      def: c.def || 5,
+      atk: c.atk || 14,
+      def: c.def || 6,
       speed: c.speed || 1.0,
       color: "#3a5a2a",
       aggroRange: c.aggroRange || 120,
@@ -210,7 +210,7 @@ class WooliesCockroach extends Enemy {
       enemyType: "cockroach",
       name: "Shelf Roach",
       hp: c.hp || 10,
-      atk: c.atk || 3,
+      atk: c.atk || 4,
       def: 0,
       speed: c.speed || 3.2,
       color: "#4a3020",
@@ -240,8 +240,8 @@ class RogueSelfCheckout extends Enemy {
       enemyType: "selfCheckout",
       name: "ROGUE SELF-CHECKOUT",
       hp: c.hp || 80,
-      atk: c.atk || 8,
-      def: c.def || 8,
+      atk: c.atk || 10,
+      def: c.def || 10,
       speed: 0,
       color: "#606060",
       aggroRange: 140,
@@ -330,15 +330,15 @@ class TrolleyRunner extends Enemy {
       enemyType: "trolleyRunner",
       name: "RUNAWAY TROLLEY",
       hp: c.hp || 35,
-      atk: c.atk || 15,
-      def: c.def || 4,
+      atk: c.atk || 18,
+      def: c.def || 5,
       speed: c.speed || 4.0,
       color: "#999",
       aggroRange: 180,
       ai: "chase",
       expReward: 8,
       width: 28, height: 20,
-      contactDamage: 18
+      contactDamage: 22
     });
     this._chargeDir = c.chargeDir || 1;
     this._charging = false;
@@ -414,7 +414,7 @@ class ExpiredSlime extends Enemy {
       enemyType: "expiredSlime",
       name: "Expired Food Slime",
       hp: c.hp || 30,
-      atk: c.atk || 5,
+      atk: c.atk || 6,
       def: c.def || 2,
       speed: c.speed || 0.6,
       color: "#608030",
@@ -482,8 +482,8 @@ class KarenFriend extends Enemy {
       enemyType: "karenFriend",
       name: c.name || "Karen's BFF",
       hp: c.hp || 60,
-      atk: c.atk || 14,
-      def: c.def || 3,
+      atk: c.atk || 17,
+      def: c.def || 4,
       speed: c.speed || 1.8,
       color: "#c04020",
       aggroRange: c.aggroRange || 160,
@@ -715,13 +715,13 @@ class Stage2_B1 {
     var rats = [
       { x: 200, y: 240 }, { x: 700, y: 225 }, { x: 740, y: 230 },
       { x: 810, y: 225 }, { x: 1250, y: 240 }, { x: 1350, y: 230 },
-      { x: 2450, y: 230 }, { x: 2750, y: 222 }, { x: 2950, y: 230 },
-      { x: 3150, y: 230 }
+      { x: 1700, y: 235 }, { x: 2450, y: 230 }, { x: 2750, y: 222 },
+      { x: 2950, y: 230 }, { x: 3150, y: 230 }, { x: 3250, y: 225 }
     ];
     for (var i = 0; i < rats.length; i++) spawn(FruitRat, rats[i]);
 
     /* === Cockroach swarms — small clusters near shelves === */
-    var roachSpots = [160, 380, 560, 870, 1040, 1430, 1660, 2260, 2600, 2830, 3000, 3280];
+    var roachSpots = [160, 380, 560, 870, 1040, 1430, 1660, 1900, 2260, 2600, 2830, 3000, 3180, 3280];
     for (var i = 0; i < roachSpots.length; i++) {
       for (var j = 0; j < 2 + Math.floor(Math.random() * 2); j++) {
         spawn(WooliesCockroach, {
@@ -734,20 +734,23 @@ class Stage2_B1 {
     /* === Zombie Guards — patrolling aisles === */
     var guards = [
       { x: 350, y: 220 }, { x: 650, y: 220 }, { x: 1050, y: 220 },
-      { x: 1500, y: 220 }, { x: 2050, y: 195 }, { x: 2500, y: 220 },
-      { x: 2880, y: 220 }, { x: 3200, y: 220 }
+      { x: 1500, y: 220 }, { x: 1800, y: 220 }, { x: 2050, y: 195 },
+      { x: 2500, y: 220 }, { x: 2880, y: 220 }, { x: 3100, y: 220 },
+      { x: 3200, y: 220 }
     ];
     for (var i = 0; i < guards.length; i++) spawn(ZombieGuard, guards[i]);
 
     /* === Rogue Self-Checkouts — stationary turrets === */
     spawn(RogueSelfCheckout, { x: 100, y: 218 });
     spawn(RogueSelfCheckout, { x: 470, y: 218 });
+    spawn(RogueSelfCheckout, { x: 1560, y: 218 });
     spawn(RogueSelfCheckout, { x: 2420, y: 218 });
 
     /* === Trolley Runners — charge at the player === */
     spawn(TrolleyRunner, { x: 580, y: 248 });
     spawn(TrolleyRunner, { x: 1150, y: 248 });
     spawn(TrolleyRunner, { x: 1780, y: 248 });
+    spawn(TrolleyRunner, { x: 2400, y: 248 });
     spawn(TrolleyRunner, { x: 2680, y: 245 });
     spawn(TrolleyRunner, { x: 3350, y: 248 });
 
@@ -758,6 +761,7 @@ class Stage2_B1 {
     spawn(ExpiredSlime, { x: 2760, y: 228 });
     spawn(ExpiredSlime, { x: 2920, y: 240 });
     spawn(ExpiredSlime, { x: 3060, y: 240 });
+    spawn(ExpiredSlime, { x: 3180, y: 235 });
   }
 
   _spawnItems() {

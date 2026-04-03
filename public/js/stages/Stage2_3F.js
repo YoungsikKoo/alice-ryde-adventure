@@ -4,10 +4,10 @@
    Map: 72x60 (20% larger). Event Cinema Australia interior.
 
    Layout: Central lobby + 4 Cinema Halls
-     Cinema 1 (top-left):  Romance → 9 Vampire mobs
-     Cinema 2 (top-right): War → 10 Soldiers
-     Cinema 3 (bot-left):  Zombie → 10 Zombies
-     Cinema 4 (bot-right): Ryde PS OC → 10 Math Monsters + Boss
+     Cinema 1 (top-left):  Romance → 11 Vampire mobs
+     Cinema 2 (top-right): War → 12 Soldiers
+     Cinema 3 (bot-left):  Zombie → 12 Zombies
+     Cinema 4 (bot-right): Ryde PS OC → 12 Math Monsters + Boss
 
    Doors open sequentially: 1 → 2 → 3 → 4 (after 1-3 cleared)
    Magic Sword in Cinema 1 (after RUN!!! sequence)
@@ -116,7 +116,7 @@ class RomanceMob extends Enemy {
     super(game, {
       x:cfg.x, y:cfg.y, width:20, height:24, speed:1.2, color:"#ff69b4",
       enemyType:"romanceMob", name: cfg.gender==="m" ? "Romeo" : "Juliet",
-      hp:38, atk:8, def:3, contactDamage:10, ai:"chase", aggroRange:120, expReward:6
+      hp:38, atk:10, def:4, contactDamage:12, ai:"chase", aggroRange:120, expReward:6
     });
     this.aggroed = false;
     this._gender = cfg.gender || "f";
@@ -320,7 +320,7 @@ class WarSoldier extends Enemy {
     super(game, {
       x:cfg.x, y:cfg.y, width:20, height:26, speed:0.9, color:"#556b2f",
       enemyType:"warSoldier", name:"Soldier",
-      hp:50, atk:13, def:5, contactDamage:15, ai:"chase", aggroRange:160, expReward:8
+      hp:50, atk:16, def:6, contactDamage:18, ai:"chase", aggroRange:160, expReward:8
     });
     this.aggroed = false;
     this._age = 0;
@@ -574,7 +574,7 @@ class ZombieViewer extends Enemy {
     super(game, {
       x:cfg.x, y:cfg.y, width:20, height:26, speed:0, color:"#7a7",
       enemyType:"zombieViewer", name:"Zombie",
-      hp:44, atk:11, def:4, contactDamage:16, ai:"stationary", aggroRange:0, expReward:7
+      hp:44, atk:13, def:5, contactDamage:19, ai:"stationary", aggroRange:0, expReward:7
     });
     this._age = 0;
     this._transformed = false;
@@ -724,7 +724,7 @@ class MathMonster extends Enemy {
     super(game, {
       x:cfg.x, y:cfg.y, width:22, height:26, speed:2.72, color:"#a0f",
       enemyType:"mathMonster", name:cfg.name||"Math Monster",
-      hp:56, atk:14, def:5, contactDamage:18, ai:"chase", aggroRange:400, expReward:9
+      hp:56, atk:17, def:6, contactDamage:22, ai:"chase", aggroRange:400, expReward:9
     });
     this.aggroed = true;
     this._age = 0;
@@ -879,7 +879,7 @@ class MissKumarwitch extends Enemy {
     super(game, {
       x:cfg.x, y:cfg.y, width:36, height:40, speed:1.8, color:"#800080",
       enemyType:"kumarwitch", name:"Miss Kumarwitch",
-      hp:375, atk:23, def:13, contactDamage:25, ai:"chase", aggroRange:350, expReward:200
+      hp:375, atk:29, def:16, contactDamage:25, ai:"chase", aggroRange:350, expReward:200
     });
     this.aggroed = false; // Starts idle, activated by dialogue
     this._age = 0;
@@ -900,70 +900,76 @@ class MissKumarwitch extends Enemy {
     this._fleeDialogueDone = false;
     this._flashTimer = 0;
   }
+  takeDamage(amt, atk) {
+    if (!this.alive || this._fled) return;
+    this.hp -= amt;
+    this._playHurtSound();
+    if (atk) {
+      var dx = this.x - atk.x, dy = this.y - atk.y, d = Math.sqrt(dx*dx+dy*dy) || 1;
+      this.vx = (dx/d)*6; this.vy = (dy/d)*6;
+    }
+    this._flashTimer = 0.15;
+    // Every hit: grow 10% size, +10% ATK, +5% DEF
+    this._hitCount = (this._hitCount || 0) + 1;
+    this.width = Math.floor(36 * (1 + this._hitCount * 0.1));
+    this.height = Math.floor(40 * (1 + this._hitCount * 0.1));
+    this.atk = Math.floor(29 * (1 + this._hitCount * 0.1));
+    this.def = Math.floor(16 * (1 + this._hitCount * 0.05));
+    if (this._hitCount % 3 === 0) {
+      this.game.addEntity(new CinemaHealthPill(this.game, { x:this.x+20, y:this.y+30, heal:25 }));
+    }
+    if (this.game.sound) this.game.sound.playBossPhaseUp();
+    this.game.hud.addChatMessage("Miss Kumarwitch grows BIGGER! (Hit " + this._hitCount + ")", "#f0f");
+    this.game.camera.shake(3, 0.2);
+    // At 5% HP: trigger flee sequence
+    var hpRatio = this.hp / this._originalMaxHp;
+    if ((hpRatio <= 0.05 || this.hp <= 0) && !this._fled) {
+      this.hp = 1;
+      this._fled = true;
+      this.contactDamage = 0;
+      // Pause game, start flee animation immediately
+      this._fleeing = true;
+      this._fleeCenterX = 53.5 * 16;
+      this._fleeCenterY = 47 * 16;
+      this._fleeRadius = 10 * 16;
+      this._fleeAngle = 0;
+      this.game.camera.shake(8, 0.5);
+      this.game.hud.addChatMessage("Miss Kumarwitch is PANICKING! She's running away!!!", "#f0f");
+    }
+  }
   update(dt) {
     if (!this.alive || !this.aggroed) return;
     this._age += dt;
     this._flashTimer = Math.max(0, this._flashTimer - dt);
 
-    // FLEEING: dramatic counterclockwise 5 laps around Cinema 4
+    // FLEEING: counterclockwise 5 laps, then pause for dialogue, then victory
     if (this._fleeing) {
-      this._fleeAngle -= dt * 3.5; // counterclockwise
+      this._fleeAngle -= dt * 3.5;
       var laps = Math.abs(this._fleeAngle) / (Math.PI * 2);
       this.x = this._fleeCenterX + Math.cos(this._fleeAngle) * this._fleeRadius;
       this.y = this._fleeCenterY + Math.sin(this._fleeAngle) * this._fleeRadius;
-      // Shrink back to normal as she runs
       this.width = Math.max(36, this.width - dt * 8);
       this.height = Math.max(40, this.height - dt * 9);
-      // Panicked screams while running
-      if (Math.random() < 0.02) {
+      if (Math.random() < 0.03) {
         var panics = ["AAAHHHH!!","NOT FAIR!","I HATE THIS!","MY EQUATIONS!","WAIT STOP!","THIS IS SO UNFAIR!"];
         this.game.combat.spawnDamageNumber(this.x+18, this.y-10, panics[Math.floor(Math.random()*panics.length)], "#f0f");
       }
-      if (laps >= 5 && !this._fleeDialogueDone) {
-        this._fleeDialogueDone = true;
-        var self = this;
-        this.game.camera.shake(3, 0.3);
-        this.game.startDialogue([
-          { speaker:"Miss Kumarwitch", text:"Okay okay FINE you win!! But like... that was literally SO unfair." },
-          { speaker:"Miss Kumarwitch", text:"You only won because I forgot to charge my magic wand last night." },
-          { speaker:"Miss Kumarwitch", text:"Also my horoscope said 'avoid conflict today' and I DIDN'T LISTEN." },
-          { speaker:"Miss Kumarwitch", text:"Tell anyone I ran and I'll give you TRIPLE homework at Ryde Public School!!!" },
-          { speaker:"Miss Kumarwitch", text:"BYEEE! *trips over cape* ...I MEANT TO DO THAT!" },
-          { speaker:"Alice", text:"...Did she just trip over her own cape? Iconic." }
-        ], function() {
-          self.alive = false;
-          self.destroy();
-          if (self._onDeath) self._onDeath();
-        });
+      // After 5 laps: set flag for Stage2_3F controller to handle dialogue
+      if (laps >= 5 && !this._fleeComplete) {
+        this._fleeComplete = true;
+        this._fleeing = false;
       }
       return;
     }
 
     this._attackTimer -= dt;
     this._mathProjectileTimer -= dt;
-    // Check HP thresholds for growth
+    // Growth is now handled per-hit in takeDamage, remove old threshold logic
     var hpRatio = this.hp / this._originalMaxHp;
-    var threshold = Math.floor((1 - hpRatio) / 0.15);
-    if (threshold > this._scaleLevel) {
-      this._scaleLevel = threshold;
-      this.width = Math.floor(36 * (1 + this._scaleLevel * 0.1));
-      this.height = Math.floor(40 * (1 + this._scaleLevel * 0.1));
-      this.atk = Math.floor(18 * (1 + this._scaleLevel * 0.05));
-      this.def = Math.floor(10 * (1 + this._scaleLevel * 0.05));
-      this.game.addEntity(new CinemaHealthPill(this.game, { x:this.x+20, y:this.y+30, heal:25 }));
-      if (this.game.sound) this.game.sound.playBossPhaseUp();
-      this.game.hud.addChatMessage("Miss Kumarwitch grows BIGGER! (Size +" + (this._scaleLevel*10) + "%)", "#f0f");
-      this.game.camera.shake(5, 0.4);
-    }
-    // Start flee at 5% HP
+    // Safety fallback for flee trigger
     if (hpRatio <= 0.05 && !this._fled) {
       this._fled = true;
-      this._fleeing = true;
-      // Cinema 4 center for orbit
-      this._fleeCenterX = 53.5 * 16;
-      this._fleeCenterY = 47 * 16;
-      this._fleeRadius = 10 * 16;
-      this._fleeAngle = Math.atan2(this.y - this._fleeCenterY, this.x - this._fleeCenterX);
+      this.hp = 1;
       this.contactDamage = 0;
       this.def = 999; // invincible during flee
       this.game.camera.shake(8, 0.5);
@@ -984,19 +990,12 @@ class MissKumarwitch extends Enemy {
     }
     super.update(dt);
   }
-  takeDamage(amt, atk) {
-    if (!this.alive) return;
-    this.hp -= amt;
-    this._flashTimer = 0.1;
-    if (atk) { var dx=this.x-atk.x,dy=this.y-atk.y,d=Math.sqrt(dx*dx+dy*dy)||1; this.vx=(dx/d)*2; this.vy=(dy/d)*2; }
-    if (this.hp <= 0) { this.hp = 0; this.alive = false; if (this._onDeath) this._onDeath(); }
-  }
   render(ctx, camera) {
     if (!this.alive) return;
     var sp = camera.worldToScreen(this.x, this.y);
     var w = this.width, h = this.height;
     var bob = Math.sin(this._age*3)*2;
-    var scale = 1 + this._scaleLevel * 0.1;
+    var scale = 1 + (this._hitCount || 0) * 0.1;
     // Flash
     if (this._flashTimer > 0) { ctx.fillStyle = "#fff"; ctx.fillRect(sp.x-2, sp.y-2+bob, w+4, h+4); }
     // Witch robe
@@ -1228,12 +1227,13 @@ class Stage2_3F {
     this._cinema1BgmPlayed = false;
     // 9 romance mobs (4 male, 5 female) inside Cinema 1
     // Place on aisle positions (odd tiles to avoid seat collision)
-    var genders = ["m","m","m","m","f","f","f","f","f"];
+    var genders = ["m","m","m","m","m","f","f","f","f","f","f"];
     var positions = [
       {x:17,y:8},{x:18,y:8},{x:17,y:12},{x:18,y:12},
-      {x:17,y:16},{x:9,y:8},{x:12,y:12},{x:23,y:8},{x:26,y:12}
+      {x:17,y:16},{x:9,y:8},{x:12,y:12},{x:23,y:8},{x:26,y:12},
+      {x:9,y:12},{x:23,y:16}
     ];
-    for (var i = 0; i < 9; i++) {
+    for (var i = 0; i < 11; i++) {
       var mob = new RomanceMob(game, { x:positions[i].x*16, y:positions[i].y*16, gender:genders[i] });
       game.addEntity(mob);
       self._cinema1Mobs.push(mob);
@@ -1265,12 +1265,13 @@ class Stage2_3F {
     game.hud.addChatMessage("Cinema 2 OPEN! War movie screening!", "#f80");
     // BGM changes when player enters cinema 2 (tracked in update)
     this._cinema2BgmPlayed = false;
-    // 10 soldiers - center aisle (x=53-54) and between seat rows (y=8,12,16)
+    // 12 soldiers - center aisle (x=53-54) and between seat rows (y=8,12,16)
     var positions = [
       {x:53,y:8},{x:54,y:8},{x:53,y:12},{x:54,y:12},{x:53,y:16},
-      {x:54,y:16},{x:44,y:8},{x:47,y:12},{x:58,y:8},{x:61,y:12}
+      {x:54,y:16},{x:44,y:8},{x:47,y:12},{x:58,y:8},{x:61,y:12},
+      {x:44,y:16},{x:61,y:8}
     ];
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 12; i++) {
       var mob = new WarSoldier(game, { x:positions[i].x*16, y:positions[i].y*16 });
       game.addEntity(mob);
       self._cinema2Mobs.push(mob);
@@ -1282,12 +1283,13 @@ class Stage2_3F {
     this._cinema3Open = true;
     this._openDoor("c3");
     game.hud.addChatMessage("Cinema 3 OPEN! Zombie movie screening...", "#7a7");
-    // 10 zombie viewers - placed on aisle positions
+    // 12 zombie viewers - placed on aisle positions
     var positions = [
       {x:17,y:42},{x:18,y:42},{x:17,y:46},{x:18,y:46},{x:17,y:50},
-      {x:18,y:50},{x:9,y:42},{x:12,y:46},{x:23,y:42},{x:26,y:46}
+      {x:18,y:50},{x:9,y:42},{x:12,y:46},{x:23,y:42},{x:26,y:46},
+      {x:9,y:50},{x:26,y:42}
     ];
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 12; i++) {
       var mob = new ZombieViewer(game, { x:positions[i].x*16, y:positions[i].y*16, delay:4+Math.random()*0.5 });
       game.addEntity(mob);
       self._cinema3Mobs.push(mob);
@@ -1323,13 +1325,14 @@ class Stage2_3F {
 
   _spawnCinema4Monsters() {
     var game = this.game, self = this;
-    var names = ["Ethan","Sophia","Liam","Olivia","Noah","Emma","Jack","Mia","Leo","Chloe"];
+    var names = ["Ethan","Sophia","Liam","Olivia","Noah","Emma","Jack","Mia","Leo","Chloe","Aiden","Zoe"];
     // Aisle-safe positions: center aisle x=53-54, between seat rows y=41-43,45-47,49-51
     var positions = [
       {x:43,y:41},{x:46,y:43},{x:49,y:41},{x:53,y:42},{x:54,y:42},
-      {x:58,y:41},{x:61,y:43},{x:64,y:41},{x:53,y:49},{x:54,y:49}
+      {x:58,y:41},{x:61,y:43},{x:64,y:41},{x:53,y:49},{x:54,y:49},
+      {x:46,y:49},{x:61,y:49}
     ];
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 12; i++) {
       var mob = new MathMonster(game, { x:positions[i].x*16, y:positions[i].y*16, name:names[i] });
       game.addEntity(mob);
       self._cinema4Mobs.push(mob);
@@ -1364,11 +1367,11 @@ class Stage2_3F {
     ], function() {
       // Spawn boss
       var boss = new MissKumarwitch(game, {
-        x:54*16, y:46*16,
-        onDeath: function() { self._showVictory(); }
+        x:54*16, y:46*16
       });
       boss.aggroed = true;
       self._boss = boss;
+      self._bossVictoryStarted = false;
       game.addEntity(boss);
       game.hud.setBoss(boss, "Miss Kumarwitch");
       if (game.sound && game.sound.playBGM) game.sound.playBGM("boss_kumarwitch");
@@ -1518,6 +1521,48 @@ class Stage2_3F {
         this._allStudentsKilled = true;
         this._triggerBoss();
       }
+    }
+
+    // Boss flee complete → farewell dialogue → victory dialogue → Stage 3
+    if (this._boss && this._boss._fleeComplete && !this._bossVictoryStarted) {
+      this._bossVictoryStarted = true;
+      var game = this.game, self = this, boss = this._boss;
+      // Step 1: Farewell dialogue (game pauses in dialogue mode)
+      game.startDialogue([
+        { speaker:"Miss Kumarwitch", text:"Okay okay FINE you win!! But like... that was literally SO unfair." },
+        { speaker:"Miss Kumarwitch", text:"You only won because I forgot to charge my magic wand last night." },
+        { speaker:"Miss Kumarwitch", text:"Also my horoscope said 'avoid conflict today' and I DIDN'T LISTEN." },
+        { speaker:"Miss Kumarwitch", text:"Tell anyone I ran and I'll give you TRIPLE homework at Ryde Public School!!!" },
+        { speaker:"Miss Kumarwitch", text:"BYEEE! *trips over cape* ...I MEANT TO DO THAT!" },
+        { speaker:"Alice", text:"...Did she just trip over her own cape? Iconic." }
+      ], function() {
+        // Step 2: Remove boss, play victory effects
+        boss.alive = false;
+        boss.destroy();
+        game.hud.clearBoss();
+        if (game.sound) game.sound.stopBGM();
+        game.camera.shake(12, 1.0);
+        if (game.sound && game.sound.playVictoryFanfare) game.sound.playVictoryFanfare();
+        // Step 3: Victory dialogue after 1 second
+        setTimeout(function() {
+          game.startDialogue([
+            { speaker:"Miss Kumarwitch", text:"I'll be waiting at Ryde Public School... This isn't over!" },
+            { speaker:"Alice", text:"Bring it on. I've got a MAGIC SWORD now!" },
+            { speaker:"System", text:"Stage 2 - 3F COMPLETE! Event Cinema conquered!" },
+            { speaker:"System", text:"Next: Stage 3 - Ryde Public School!" }
+          ], function() {
+            // Step 4: Transition to Stage 3
+            game.hud.addChatMessage("STAGE 2 COMPLETE! Heading to Ryde Public School!", "#50c878");
+            if (game.transition) {
+              game.transition.startFade(function() {
+                if (self._onComplete) self._onComplete("complete");
+              }, function(){});
+            } else {
+              if (self._onComplete) self._onComplete("complete");
+            }
+          });
+        }, 1000);
+      });
     }
 
     // Boss dialogue trigger

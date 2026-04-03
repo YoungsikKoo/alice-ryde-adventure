@@ -33,6 +33,8 @@ class Network {
       case "stage": this._onStage(msg); break;
       case "chat": this._onChat(msg); break;
       case "hostChange": this._onHostChange(msg); break;
+      case "bossDamage": this._onBossDamage(msg); break;
+      case "bossState": this._onBossState(msg); break;
     }
   }
 
@@ -137,11 +139,64 @@ class Network {
       stage: this.game._currentStageName || "main",
       sideScrollMode: p.sideScrollMode || false
     }));
+    // Host broadcasts boss state
+    if (this.isHost) {
+      var boss = this._findLocalBoss();
+      if (boss) this.sendBossState(boss);
+    }
   }
 
   sendStageChange(stageName) {
     if (!this.connected || !this.isHost) return;
     this.ws.send(JSON.stringify({ type: "stage", stage: stageName }));
+  }
+
+  sendBossDamage(amount, isCrit) {
+    if (!this.connected) return;
+    this.ws.send(JSON.stringify({ type: "bossDamage", amount: amount, isCrit: isCrit }));
+  }
+
+  sendBossState(boss) {
+    if (!this.connected || !this.isHost) return;
+    this.ws.send(JSON.stringify({
+      type: "bossState",
+      hp: boss.hp, maxHp: boss.maxHp, alive: boss.alive,
+      x: Math.round(boss.x), y: Math.round(boss.y)
+    }));
+  }
+
+  _onBossDamage(msg) {
+    // Received damage from another player - apply to local boss
+    var boss = this._findLocalBoss();
+    if (boss && boss.alive) {
+      boss.hp -= msg.amount;
+      if (boss.hp <= 0) boss.hp = 0;
+      // Show damage number
+      this.game.combat.spawnDamageNumber(
+        boss.x + boss.width/2, boss.y - 4,
+        msg.isCrit ? msg.amount + "!!" : String(msg.amount),
+        msg.isCrit ? "#ff8844" : "#ffcc88", msg.isCrit ? 1.5 : 1
+      );
+    }
+  }
+
+  _onBossState(msg) {
+    // Guest receives authoritative boss state from host
+    if (this.isHost) return;
+    var boss = this._findLocalBoss();
+    if (boss) {
+      boss.hp = msg.hp;
+      boss.maxHp = msg.maxHp;
+      if (msg.x !== undefined) { boss.x = msg.x; boss.y = msg.y; }
+    }
+  }
+
+  _findLocalBoss() {
+    for (var i = 0; i < this.game.entities.length; i++) {
+      var e = this.game.entities[i];
+      if (e.type === "enemy" && e.isBoss && e.alive) return e;
+    }
+    return null;
   }
 
   sendChat(text) {

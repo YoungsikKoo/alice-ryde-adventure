@@ -128,8 +128,8 @@ class Scorpion extends Enemy {
       enemyType: "scorpion",
       name: c.name || "Scorpion",
       hp: c.hp || 35,
-      atk: c.atk || 10,
-      def: c.def || 3,
+      atk: c.atk || 12,
+      def: c.def || 4,
       speed: c.speed || 1.8,
       color: "#c8a060",
       aggroRange: c.aggroRange || 100,
@@ -282,8 +282,9 @@ class Stage2_B2 {
     /* Cars in different sections */
     var carSpawns = [
       { x: 100, dir: 1 }, { x: 500, dir: -1 }, { x: 900, dir: 1 },
-      { x: 1200, dir: -1 }, { x: 1600, dir: 1 }, { x: 2000, dir: -1 },
-      { x: 2400, dir: 1 }, { x: 2800, dir: -1 }, { x: 3100, dir: 1 }
+      { x: 1200, dir: -1 }, { x: 1600, dir: 1 }, { x: 1900, dir: -1 },
+      { x: 2000, dir: -1 }, { x: 2400, dir: 1 }, { x: 2800, dir: -1 },
+      { x: 3100, dir: 1 }, { x: 3400, dir: -1 }
     ];
     for (var i = 0; i < carSpawns.length; i++) {
       var s = carSpawns[i];
@@ -307,11 +308,12 @@ class Stage2_B2 {
       { x: 700, y: 240 }, { x: 850, y: 210 },
       { x: 1080, y: 230 }, { x: 1200, y: 240 },
       { x: 1400, y: 225 }, { x: 1600, y: 230 },
-      { x: 1800, y: 220 }, { x: 2100, y: 190 },
-      { x: 2300, y: 190 }, { x: 2500, y: 210 },
+      { x: 1800, y: 220 }, { x: 1950, y: 225 },
+      { x: 2100, y: 190 }, { x: 2300, y: 190 },
+      { x: 2500, y: 210 }, { x: 2650, y: 220 },
       { x: 2750, y: 230 }, { x: 2900, y: 230 },
       { x: 3100, y: 220 }, { x: 3250, y: 230 },
-      { x: 3400, y: 215 }
+      { x: 3400, y: 215 }, { x: 3500, y: 230 }
     ];
     for (var i = 0; i < spawns.length; i++) {
       var s = spawns[i];
@@ -324,7 +326,7 @@ class Stage2_B2 {
     /* A few cockroaches too */
     var roaches = [
       { x: 350, y: 256 }, { x: 950, y: 256 }, { x: 1500, y: 256 },
-      { x: 2150, y: 200 }, { x: 3000, y: 240 }
+      { x: 2150, y: 200 }, { x: 2700, y: 240 }, { x: 3000, y: 240 }
     ];
     for (var j = 0; j < roaches.length; j++) {
       var r = roaches[j];

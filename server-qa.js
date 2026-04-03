@@ -116,6 +116,16 @@ wss.on("connection", (ws) => {
       broadcast({ type: "stage", stage: msg.stage }, id);
     }
 
+    if (msg.type === "bossDamage") {
+      // Forward boss damage to all other players so they can sync boss HP
+      broadcast({ type: "bossDamage", amount: msg.amount, isCrit: msg.isCrit, attackerId: id }, id);
+    }
+
+    if (msg.type === "bossState") {
+      // Host broadcasts boss HP state to all
+      broadcast({ type: "bossState", hp: msg.hp, maxHp: msg.maxHp, alive: msg.alive, x: msg.x, y: msg.y }, id);
+    }
+
     if (msg.type === "chat") {
       broadcast({ type: "chat", id: id, name: player.name, text: msg.text });
     }

@@ -4,11 +4,11 @@
    5 Zones → Aerobics King Boss after all zones cleared.
 
    Zones (proximity-triggered):
-     1. Treadmill Zone   → 3 Treadmill Zombies
-     2. Yoga Studio      → 6 Yoga Rollers (Indian BGM)
-     3. Spinning Room    → 3 Spin Bikes + 3 Cyclists (6 total)
-     4. Bench Press Area → 3 Bench Press Strongmen
-     5. Swimming Pool    → 5 Dolphins + Whirlpool drain
+     1. Treadmill Zone   → 4 Treadmill Zombies
+     2. Yoga Studio      → 7 Yoga Rollers (Indian BGM)
+     3. Spinning Room    → 4 Spin Bikes + 4 Cyclists (8 total)
+     4. Bench Press Area → 4 Bench Press Strongmen
+     5. Swimming Pool    → 7 Dolphins + Whirlpool drain
 
    Boss: Aerobics King Instructor
      100-50%  Aerobic kick attacks + whistle stun
@@ -26,8 +26,8 @@ class GymMachine extends Enemy {
       enemyType: "gymMachine",
       name: cfg.name || "Gym Equipment",
       hp: cfg.hp || 72,
-      atk: 0, def: 4,
-      contactDamage: 4,
+      atk: 0, def: 5,
+      contactDamage: 5,
       ai: "stationary",
       aggroRange: 0,
       expReward: 12
@@ -158,7 +158,7 @@ class TreadmillZombie extends Enemy {
       speed: 3.5, color: "#556b2f",
       enemyType: "treadmillZombie",
       name: "Treadmill Zombie",
-      hp: 42, atk: 11, def: 4,
+      hp: 42, atk: 13, def: 5,
       ai: "chase", aggroRange: 150,
       expReward: 8
     });
@@ -200,7 +200,7 @@ class TreadmillZombie extends Enemy {
   }
 }
 
-/* ========== 2. YOGA STUDIO (one big studio, 6 yoga students) ========== */
+/* ========== 2. YOGA STUDIO (one big studio, 7 yoga students) ========== */
 class YogaStudio extends GymMachine {
   constructor(game, cfg) {
     super(game, Object.assign({
@@ -221,9 +221,10 @@ class YogaStudio extends GymMachine {
       if (this.game.sound) this.game.sound.playBGM("yoga_indian");
       var positions = [
         {x:this.x+20, y:this.y+20},{x:this.x+60, y:this.y+20},{x:this.x+100, y:this.y+20},
-        {x:this.x+20, y:this.y+60},{x:this.x+60, y:this.y+60},{x:this.x+100, y:this.y+60}
+        {x:this.x+20, y:this.y+60},{x:this.x+60, y:this.y+60},{x:this.x+100, y:this.y+60},
+        {x:this.x+140, y:this.y+40}
       ];
-      for (var i=0; i<6; i++) {
+      for (var i=0; i<7; i++) {
         var s = new YogaStudent(this.game, { x:positions[i].x, y:positions[i].y });
         this.game.addEntity(s);
         this._students.push(s);
@@ -262,7 +263,7 @@ class YogaStudent extends Enemy {
       speed: 0, color: "#9b59b6",
       enemyType: "yogaStudent",
       name: "Yoga Student",
-      hp: 36, atk: 8, def: 2,
+      hp: 36, atk: 10, def: 2,
       ai: "stationary", aggroRange: 0,
       expReward: 6
     });
@@ -499,7 +500,7 @@ class SpinCyclist extends Enemy {
       speed: 3.0, color: "#e67e22",
       enemyType: "spinCyclist",
       name: "Spin Cyclist",
-      hp: 36, atk: 10, def: 4,
+      hp: 36, atk: 12, def: 5,
       ai: "chase", aggroRange: 140,
       expReward: 7
     });
@@ -600,7 +601,7 @@ class BenchStrongman extends Enemy {
       speed: 1.4, color: "#c0392b",
       enemyType: "benchStrongman",
       name: "Strongman",
-      hp: 60, atk: 14, def: 7,
+      hp: 60, atk: 17, def: 8,
       ai: "chase", aggroRange: 130,
       expReward: 10
     });
@@ -664,7 +665,7 @@ class BarbellProjectile extends Entity {
     });
     this._dirX = cfg.dirX; this._dirY = cfg.dirY;
     this._age = 0; this._lifetime = 4;
-    this.contactDamage = 24;
+    this.contactDamage = 29;
     this._spin = 0;
   }
   update(dt) {
@@ -698,7 +699,7 @@ class BarbellProjectile extends Entity {
   }
 }
 
-/* ========== 5. SWIMMING POOL (one big pool, 6 confined dolphins) ========== */
+/* ========== 5. SWIMMING POOL (one big pool, 7 confined dolphins) ========== */
 class BigPool extends GymMachine {
   constructor(game, cfg) {
     super(game, Object.assign({
@@ -718,10 +719,10 @@ class BigPool extends GymMachine {
     if (!this._spawned) {
       this._spawned = true;
       if (this.game.sound) { this.game.sound.playSplash && this.game.sound.playSplash(); this.game.sound.playDolphinSqueak(); }
-      this.game.hud.addChatMessage("6 DOLPHINS splash inside the pool!", "#3af");
+      this.game.hud.addChatMessage("7 DOLPHINS splash inside the pool!", "#3af");
       this.game.camera.shake(4, 0.4);
-      for (var i=0; i<6; i++) {
-        var dx = 30+Math.floor(i%3)*70, dy = 24+Math.floor(i/3)*50;
+      for (var i=0; i<7; i++) {
+        var dx = 30+Math.floor(i%4)*55, dy = 24+Math.floor(i/4)*50;
         var d = new PoolDolphin(this.game, {
           x:this.x+dx, y:this.y+dy,
           poolLeft:this._poolLeft, poolRight:this._poolRight,
@@ -793,7 +794,7 @@ class PoolDolphin extends Enemy {
       speed: 2.2, color: "#3498db",
       enemyType: "poolDolphin",
       name: "Pool Dolphin",
-      hp: 34, atk: 11, def: 4,
+      hp: 34, atk: 13, def: 5,
       ai: "chase", aggroRange: 130,
       expReward: 6
     });
@@ -903,7 +904,7 @@ class AerobicsKingBoss extends Enemy {
       speed: 2.0, color: "#ff1493",
       enemyType: "aerobicsKing",
       name: "Aerobics King",
-      hp: 240, atk: 18, def: 7,
+      hp: 240, atk: 23, def: 9,
       ai: "chase", aggroRange: 300,
       expReward: 100
     });
@@ -1140,7 +1141,7 @@ class AerobicStudent extends Enemy {
       speed: 4.0, color: "#ff69b4",
       enemyType: "aerobicStudent",
       name: "Aerobic Student",
-      hp: 18, atk: 6, def: 1,
+      hp: 18, atk: 7, def: 1,
       ai: "chase", aggroRange: 200,
       expReward: 4
     });
@@ -1204,7 +1205,7 @@ class Stage2_2F {
     this.game = null;
     this._machines = [];
     this._machinesDestroyed = 0;
-    this._totalMachines = 12; // 3+1+4+3+1
+    this._totalMachines = 14; // 4+1+4+4+1
     this._boss = null;
     this._bossTriggered = false;
     this._age = 0;
@@ -1292,7 +1293,7 @@ class Stage2_2F {
 
     game.camera.setMapBounds(W*16, H*16);
     game.hud.showStageName("2F - FITNESS FIRST GYM");
-    game.hud.addChatMessage("Welcome to Fitness First! Destroy all 12 machines!", "#50c878");
+    game.hud.addChatMessage("Welcome to Fitness First! Destroy all 14 machines!", "#50c878");
     game.hud.addChatMessage("Get close to activate, then ATTACK!", "#88bbff");
 
     var self = this;
@@ -1309,11 +1310,12 @@ class Stage2_2F {
       }
     };
 
-    // ---- ZONE 1: 3 Treadmills (left side, spaced vertically) ----
+    // ---- ZONE 1: 4 Treadmills (left side, spaced vertically) ----
     var treadmillPositions = [
       { x: 4*16, y: 20*16 },
       { x: 4*16, y: 24*16 },
-      { x: 4*16, y: 28*16 }
+      { x: 4*16, y: 28*16 },
+      { x: 4*16, y: 32*16 }
     ];
     for (var ti = 0; ti < treadmillPositions.length; ti++) {
       var tm = new TreadmillMachine(game, {
@@ -1324,7 +1326,7 @@ class Stage2_2F {
       self._machines.push(tm);
     }
 
-    // ---- ZONE 2: 1 Yoga Studio (big studio, spawns 6 yoga students) ----
+    // ---- ZONE 2: 1 Yoga Studio (big studio, spawns 7 yoga students) ----
     var yogaStudio = new YogaStudio(game, {
       x: 39*16, y: 11*16,
       onDestroy: onMachineDestroy
@@ -1332,11 +1334,12 @@ class Stage2_2F {
     game.addEntity(yogaStudio);
     self._machines.push(yogaStudio);
 
-    // ---- ZONE 3: 3 Spin Bikes (inside spinning room, each spawns 1 cyclist = 6 total) ----
+    // ---- ZONE 3: 4 Spin Bikes (inside spinning room, each spawns 1 cyclist = 8 total) ----
     var spinPositions = [
       { x: 22*16, y: 12*16 },
       { x: 26*16, y: 12*16 },
-      { x: 30*16, y: 12*16 }
+      { x: 30*16, y: 12*16 },
+      { x: 34*16, y: 12*16 }
     ];
     for (var si = 0; si < spinPositions.length; si++) {
       var sb = new SpinBike(game, {
@@ -1347,11 +1350,12 @@ class Stage2_2F {
       self._machines.push(sb);
     }
 
-    // ---- ZONE 4: 3 Bench Presses (bottom-left, spaced) ----
+    // ---- ZONE 4: 4 Bench Presses (bottom-left, spaced) ----
     var benchPositions = [
       { x: 4*16, y: 35*16 },
       { x: 10*16, y: 35*16 },
-      { x: 16*16, y: 35*16 }
+      { x: 16*16, y: 35*16 },
+      { x: 22*16, y: 35*16 }
     ];
     for (var bi = 0; bi < benchPositions.length; bi++) {
       var bp = new BenchPressStation(game, {
@@ -1362,7 +1366,7 @@ class Stage2_2F {
       self._machines.push(bp);
     }
 
-    // ---- ZONE 5: 1 Big Pool (spawns 6 confined dolphins) ----
+    // ---- ZONE 5: 1 Big Pool (spawns 7 confined dolphins) ----
     var bigPool = new BigPool(game, {
       x: 36*16, y: 31*16,
       onDestroy: onMachineDestroy

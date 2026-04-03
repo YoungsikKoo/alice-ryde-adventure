@@ -75,8 +75,8 @@ class ArcadeMachine extends Enemy {
       enemyType: "machine",
       name: cfg.name || "Machine",
       hp: cfg.hp || 92,
-      atk: 0, def: 6,
-      contactDamage: 6,
+      atk: 0, def: 7,
+      contactDamage: 7,
       ai: "stationary",
       aggroRange: 0,
       expReward: 15
@@ -647,8 +647,8 @@ class ArcadeProjectile extends Enemy {
       speed: 0, color: cfg.color || "#fff",
       enemyType: cfg.enemyType || "projectile",
       name: cfg.name || "Projectile",
-      hp: 1, atk: cfg.damage || 6, def: 0,
-      contactDamage: cfg.damage || 6,
+      hp: 1, atk: cfg.damage || 7, def: 0,
+      contactDamage: cfg.damage || 7,
       ai: "stationary", aggroRange: 0, expReward: 0
     });
     this.damage = cfg.damage || 5;
@@ -805,7 +805,7 @@ class LivingDoll extends Enemy {
       x: cfg.x, y: cfg.y, width: 14, height: 14,
       speed: 1.2, color: "#50c878",
       enemyType: "doll", name: "Doll",
-      hp: cfg.hp || 29, atk: cfg.atk || 9, def: 1,
+      hp: cfg.hp || 29, atk: cfg.atk || 11, def: 1,
       aggroRange: 150, ai: "chase", expReward: 5
     });
     this.aggroed = true; // Attack immediately on spawn
@@ -872,7 +872,7 @@ class ArcadeMole extends Enemy {
       x: cfg.x, y: cfg.y, width: 14, height: 14,
       speed: 1.5, color: "#8b6914",
       enemyType: "mole", name: "Mole",
-      hp: cfg.hp || 35, atk: cfg.atk || 10, def: 2,
+      hp: cfg.hp || 35, atk: cfg.atk || 12, def: 2,
       aggroRange: 120, ai: "stationary", expReward: 6
     });
     this.aggroed = true;
@@ -939,7 +939,7 @@ class ZombieDrummer extends Enemy {
       x: cfg.x, y: cfg.y, width: 16, height: 20,
       speed: 1.0, color: "#6a6",
       enemyType: "zombie_drummer", name: "Zombie Drummer",
-      hp: cfg.hp || 40, atk: cfg.atk || 12, def: 3,
+      hp: cfg.hp || 40, atk: cfg.atk || 14, def: 4,
       aggroRange: 130, ai: "chase", expReward: 8
     });
     this._transformed = false; this._transformTimer = 0.5+Math.random()*0.5;
@@ -991,7 +991,7 @@ class HipHopDancer extends Enemy {
       x: cfg.x, y: cfg.y, width: 16, height: 20,
       speed: 1.8, color: "#f0d060",
       enemyType: "hiphop_dancer", name: "Hip-Hop Dancer",
-      hp: cfg.hp || 46, atk: cfg.atk || 13, def: 2,
+      hp: cfg.hp || 46, atk: cfg.atk || 16, def: 2,
       aggroRange: 140, ai: "chase", expReward: 10
     });
     this._transformed = false; this._transformTimer = 0.5+Math.random()*0.5;
@@ -1151,7 +1151,7 @@ class KFCKingBoss extends Enemy {
       x: cfg.x, y: cfg.y, width: 28, height: 32,
       speed: 1.0, color: "#fff",
       enemyType: "kfc_king", name: "Col. Sanders King Demon",
-      hp: cfg.hp || 575, atk: 17, def: 7,
+      hp: cfg.hp || 575, atk: 21, def: 9,
       aggroRange: 200, ai: "chase", expReward: 80
     });
     this.isBoss = true;
@@ -1159,14 +1159,27 @@ class KFCKingBoss extends Enemy {
     this._phase = 1; this._atkTimer = 2; this._laughTimer = 4; this._age = 0;
     this._zingers = []; this._splitDone = false; this._chickenForm = false;
     this._onDefeat = cfg.onDefeat || null;
+    this._defeated = false;
+  }
+  takeDamage(amt, atk) {
+    if (!this.alive) return;
+    this.hp -= amt;
+    this._playHurtSound();
+    if (atk) {
+      var dx = this.x - atk.x, dy = this.y - atk.y, d = Math.sqrt(dx*dx+dy*dy) || 1;
+      this.vx = (dx/d)*6; this.vy = (dy/d)*6;
+    }
+    // Don't set alive=false here - let update() handle death with onDefeat callback
+    if (this.hp <= 0) this.hp = 0;
   }
   update(dt) {
+    if (this._defeated) return;
     super.update(dt); if (!this.alive) return;
     this._age += dt;
     var pct = this.hp / this.maxHp;
     var p = this.game.localPlayer;
     if (pct <= 0.7 && this._phase === 1) {
-      this._phase = 2; this.atk = 23;
+      this._phase = 2; this.atk = 29;
       if (this.game.sound) this.game.sound.playBossPhaseUp();
       this.game.hud.addChatMessage("Colonel throws drumsticks! ATK UP!", "#f44");
     }
@@ -1178,7 +1191,7 @@ class KFCKingBoss extends Enemy {
       this.game.camera.shake(6, 0.5);
     }
     if (pct <= 0.25 && this._phase === 3 && !this._splitDone) {
-      this._phase = 4; this._splitDone = true; this.def = 14;
+      this._phase = 4; this._splitDone = true; this.def = 18;
       if (this.game.sound) this.game.sound.playBossPhaseUp();
       this.game.hud.addChatMessage("Splits into 5 ZINGER BURGERS! DEF UP!", "#f0d060");
       if (this.game.sound) { this.game.sound.stopBGM(); this.game.sound.playBGM("kfc_final"); this.game.sound.playKFCJingle(); }
@@ -1235,8 +1248,10 @@ class KFCKingBoss extends Enemy {
       this._laughTimer = 3+Math.random()*2;
       if (this.game.sound) this.game.sound.playCreepyLaugh();
     }
-    if (this.hp <= 0) {
+    if (this.hp <= 0 && !this._defeated) {
+      this._defeated = true;
       this.alive = false;
+      this.active = false;
       this._zingers.forEach(function(z){if(z.alive){z.hp=0;z.alive=false;z.destroy()}});
       if (this.game.sound) { this.game.sound.stopBGM(); this.game.sound.playIceCreamMelt(); }
       this.game.hud.clearBoss();
@@ -1244,7 +1259,8 @@ class KFCKingBoss extends Enemy {
       this.game.hud.addChatMessage("\"Chicken is always right!\"", "#f0d060");
       this.game.camera.shake(8, 1.0);
       if (this._onDefeat) this._onDefeat();
-      this.destroy();
+      var self = this;
+      setTimeout(function(){ self.destroy(); }, 500);
     }
   }
   render(ctx, camera) {
@@ -1293,7 +1309,7 @@ class Stage2_1F {
     this.game = null;
     this._machines = [];
     this._machinesDestroyed = 0;
-    this._totalMachines = 7;
+    this._totalMachines = 8;
     this._boss = null;
     this._bossTriggered = false;
     this._age = 0;
@@ -1381,8 +1397,12 @@ class Stage2_1F {
     var m7 = new PumpDanceMachine(game, { x: 18*16, y: 32*16, onDestroy: onMachineDestroy,
       onActivate: function(m) { game.hud.addChatMessage("Pump It Up! Dancer transformed!", "#e040e0"); }
     });
+    // 8. Extra Shooting Game (bottom-left)
+    var m8 = new ShootingMachine(game, { x: 5*16, y: 32*16, onDestroy: onMachineDestroy,
+      onActivate: function(m) { game.hud.addChatMessage("Another shooter activated! More bullets!", "#556b2f"); }
+    });
 
-    this._machines = [m1, m2, m3, m4, m5, m6, m7];
+    this._machines = [m1, m2, m3, m4, m5, m6, m7, m8];
     for (var i=0; i<this._machines.length; i++) game.addEntity(this._machines[i]);
   }
 

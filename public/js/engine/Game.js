@@ -13,28 +13,57 @@ class Game{constructor(canvasId){this.canvas=document.getElementById(canvasId);t
 }for(let i=this.entities.length-1;i>=0;i--){this.entities[i].update(this.deltaTime);if(this.entities[i].destroyed)this.entities.splice(i,1)}this.combat.update(this.deltaTime);this.camera.update(this.deltaTime);this.hud.update(this.deltaTime);this.input.update()}render(){const ctx=this.renderer.begin();this.renderer.clear("#c0c0d0");if(this.state==="loading")return;if(this.state==="intro"&&this.introScreen){this.introScreen.render(ctx);this.renderer.end();return}if(this.currentStage&&this.currentStage.currentSub&&this.currentStage.currentSub.ss&&this.currentStage.currentSub.ss.active){this.currentStage.currentSub.render(ctx,this.camera)}else if(this.currentStage&&this.currentStage.ss&&this.currentStage.ss.active){this.currentStage.render(ctx,this.camera)}else{if(this.tileMap)this.tileMap.render(ctx,this.camera);if(this.currentStage&&this.currentStage.currentSub&&this.currentStage.currentSub.render&&(!this.currentStage.currentSub.ss||!this.currentStage.currentSub.ss.active))this.currentStage.currentSub.render(ctx,this.camera)};const sorted=[...this.entities].sort((a,b)=>a.y-b.y);for(const e of sorted)e.render(ctx,this.camera);this.combat.render(ctx,this.camera);this.hud.render(ctx);if(this.state==="dialogue")this.dialogue.render(ctx);if(this.transition&&this.transition.active)this.transition.render(ctx);this.renderer.renderFlash(this.deltaTime);this.renderer.end()}loadStage(stage){this.entities=this.entities.filter(e=>e instanceof Player);this.currentStage=stage;stage.init(this)}addEntity(e){this.entities.push(e)}removeEntity(e){e.destroyed=true}getEntitiesInRadius(x,y,r,filter){return this.entities.filter(e=>{if(filter&&!filter(e))return false;const dx=e.x-x,dy=e.y-y;return dx*dx+dy*dy<=r*r})}updateLoadingBar(pct,text){const b=document.getElementById("loading-bar"),t=document.getElementById("loading-text");if(b)b.style.width=pct+"%";if(t)t.textContent=text}_handleDeath(){
   if(this._respawning)return;
   this._respawning=true;
-  this.state="paused";
   this.camera.shake(8,0.5);
-  // GAME OVER 메시지
-  this.hud.addChatMessage("GAME OVER! Restarting in 3...","#f44");
-  let count=2;
-  const tick=setInterval(()=>{
-    this.hud.addChatMessage("Restarting in "+count+"...","#f44");
-    count--;
-    if(count<0){
-      clearInterval(tick);
-      this._doRespawn();
-    }
-  },1000);
+  // Check if any other player is alive (co-op mode)
+  var otherAlive=false;
+  if(this.network&&this.network.connected){
+    for(var [id,rp] of this.network.remotePlayers){if(rp.alive){otherAlive=true;break}}
+  }
+  if(otherAlive){
+    // Co-op respawn: don't restart stage, quick revive
+    this.hud.addChatMessage("DOWN! Reviving in 3...","#f44");
+    // Lock surviving players from progressing
+    for(var [id,rp] of this.network.remotePlayers){if(rp.alive)rp._waitingForTeammate=true}
+    var self=this;
+    var count=2;
+    var tick=setInterval(function(){
+      self.hud.addChatMessage("Reviving in "+count+"...","#f44");
+      count--;
+      if(count<0){clearInterval(tick);self._coopRespawn()}
+    },1000);
+  } else {
+    // Solo or all dead: full restart
+    this.state="paused";
+    this.hud.addChatMessage("GAME OVER! Restarting in 3...","#f44");
+    var self=this;
+    var count=2;
+    var tick=setInterval(function(){
+      self.hud.addChatMessage("Restarting in "+count+"...","#f44");
+      count--;
+      if(count<0){clearInterval(tick);self._doRespawn()}
+    },1000);
+  }
+}
+_coopRespawn(){
+  var p=this.localPlayer;
+  p.hp=Math.floor(p.maxHp*0.3);
+  p.alive=true;
+  p.alpha=1;
+  p.invincible=true;
+  p.invincibleTimer=3;
+  p.vx=0;p.vy=0;
+  p._needsRegroup=true;
+  this._respawning=false;
+  this.state="playing";
+  this.hud.addChatMessage("기다려줘~~~","#f0d060");
+  if(this.network&&this.network.connected){this.network.sendChat("기다려줘~~~")}
 }
 _doRespawn(){
   const stage=this.currentStage;
   if(!stage){this._respawning=false;this.state="playing";return;}
   this.state="playing";
   this.transition.startFade(()=>{
-    // 엔티티 정리
     this.entities=this.entities.filter(e=>e instanceof Player);
-    // 플레이어 리셋
     this.localPlayer.hp=this.localPlayer.maxHp;
     this.localPlayer.alive=true;
     this.localPlayer.alpha=1;
@@ -43,7 +72,6 @@ _doRespawn(){
     this.localPlayer.vy=0;
     if(this.localPlayer.svx!==undefined)this.localPlayer.svx=0;
     if(this.localPlayer.svy!==undefined)this.localPlayer.svy=0;
-    // 서브스테이지 재시작
     if(stage._loadSub&&this._currentSubName){
       stage._loadSub(this,this._currentSubName);
     } else {
