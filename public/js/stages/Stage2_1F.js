@@ -74,9 +74,9 @@ class ArcadeMachine extends Enemy {
       speed: 0, color: cfg.color || "#444",
       enemyType: "machine",
       name: cfg.name || "Machine",
-      hp: cfg.hp || 80,
-      atk: 0, def: 5,
-      contactDamage: 5,
+      hp: cfg.hp || 92,
+      atk: 0, def: 6,
+      contactDamage: 6,
       ai: "stationary",
       aggroRange: 0,
       expReward: 15
@@ -154,7 +154,7 @@ class RacingMachine extends ArcadeMachine {
   constructor(game, cfg) {
     super(game, Object.assign({
       name: "Racing Game", machineType: "racing", color: "#e84855",
-      hp: 80, label: "RACING", spawnInterval: 3, triggerRange: 80
+      hp: 92, label: "RACING", spawnInterval: 3, triggerRange: 80
     }, cfg));
   }
   update(dt) {
@@ -208,7 +208,7 @@ class ShootingMachine extends ArcadeMachine {
   constructor(game, cfg) {
     super(game, Object.assign({
       name: "Shooting Game", machineType: "shooting", color: "#556b2f",
-      hp: 80, label: "SHOOTER", spawnInterval: 2, triggerRange: 80
+      hp: 92, label: "SHOOTER", spawnInterval: 2, triggerRange: 80
     }, cfg));
     this._grenadeChance = 0.25;
   }
@@ -269,7 +269,7 @@ class DrumRhythmMachine extends ArcadeMachine {
   constructor(game, cfg) {
     super(game, Object.assign({
       name: "Drum Rhythm", machineType: "drum", color: "#8b4513",
-      hp: 80, label: "TAIKO DRUM", spawnInterval: 5, triggerRange: 70
+      hp: 92, label: "TAIKO DRUM", spawnInterval: 5, triggerRange: 70
     }, cfg));
     this._spawned = false;
   }
@@ -332,7 +332,7 @@ class BowlingMachine extends ArcadeMachine {
   constructor(game, cfg) {
     super(game, Object.assign({
       name: "Bowling Alley", machineType: "bowling", color: "#4a90d9",
-      hp: 90, label: "BOWLING", spawnInterval: 2.5, triggerRange: 80,
+      hp: 104, label: "BOWLING", spawnInterval: 2.5, triggerRange: 80,
       w: 56, h: 44
     }, cfg));
   }
@@ -394,7 +394,7 @@ class ClawMachineCabinet extends ArcadeMachine {
   constructor(game, cfg) {
     super(game, Object.assign({
       name: "Claw Machine", machineType: "claw", color: "#ff69b4",
-      hp: 70, label: "UFO CATCHER", spawnInterval: 4, triggerRange: 65
+      hp: 81, label: "UFO CATCHER", spawnInterval: 4, triggerRange: 65
     }, cfg));
     this._spawned = false;
     this._dollColors = ["#ff69b4","#50c878","#f0d060","#4a90d9","#e040e0"];
@@ -482,7 +482,7 @@ class WhackAMoleMachine extends ArcadeMachine {
   constructor(game, cfg) {
     super(game, Object.assign({
       name: "Whack-a-Mole", machineType: "mole", color: "#8b6914",
-      hp: 75, label: "WHACK-A-MOLE", spawnInterval: 4, triggerRange: 70
+      hp: 86, label: "WHACK-A-MOLE", spawnInterval: 4, triggerRange: 70
     }, cfg));
     this._spawned = false;
   }
@@ -553,7 +553,7 @@ class PumpDanceMachine extends ArcadeMachine {
   constructor(game, cfg) {
     super(game, Object.assign({
       name: "Pump It Up", machineType: "pump", color: "#e040e0",
-      hp: 80, label: "PUMP IT UP", spawnInterval: 6, triggerRange: 70,
+      hp: 92, label: "PUMP IT UP", spawnInterval: 6, triggerRange: 70,
       w: 52, h: 44
     }, cfg));
     this._spawned = false;
@@ -647,8 +647,8 @@ class ArcadeProjectile extends Enemy {
       speed: 0, color: cfg.color || "#fff",
       enemyType: cfg.enemyType || "projectile",
       name: cfg.name || "Projectile",
-      hp: 1, atk: cfg.damage || 5, def: 0,
-      contactDamage: cfg.damage || 5,
+      hp: 1, atk: cfg.damage || 6, def: 0,
+      contactDamage: cfg.damage || 6,
       ai: "stationary", aggroRange: 0, expReward: 0
     });
     this.damage = cfg.damage || 5;
@@ -805,7 +805,7 @@ class LivingDoll extends Enemy {
       x: cfg.x, y: cfg.y, width: 14, height: 14,
       speed: 1.2, color: "#50c878",
       enemyType: "doll", name: "Doll",
-      hp: cfg.hp || 25, atk: cfg.atk || 8, def: 1,
+      hp: cfg.hp || 29, atk: cfg.atk || 9, def: 1,
       aggroRange: 150, ai: "chase", expReward: 5
     });
     this.aggroed = true; // Attack immediately on spawn
@@ -872,7 +872,7 @@ class ArcadeMole extends Enemy {
       x: cfg.x, y: cfg.y, width: 14, height: 14,
       speed: 1.5, color: "#8b6914",
       enemyType: "mole", name: "Mole",
-      hp: cfg.hp || 30, atk: cfg.atk || 9, def: 2,
+      hp: cfg.hp || 35, atk: cfg.atk || 10, def: 2,
       aggroRange: 120, ai: "stationary", expReward: 6
     });
     this.aggroed = true;
@@ -939,7 +939,7 @@ class ZombieDrummer extends Enemy {
       x: cfg.x, y: cfg.y, width: 16, height: 20,
       speed: 1.0, color: "#6a6",
       enemyType: "zombie_drummer", name: "Zombie Drummer",
-      hp: cfg.hp || 35, atk: cfg.atk || 10, def: 3,
+      hp: cfg.hp || 40, atk: cfg.atk || 12, def: 3,
       aggroRange: 130, ai: "chase", expReward: 8
     });
     this._transformed = false; this._transformTimer = 0.5+Math.random()*0.5;
@@ -991,7 +991,7 @@ class HipHopDancer extends Enemy {
       x: cfg.x, y: cfg.y, width: 16, height: 20,
       speed: 1.8, color: "#f0d060",
       enemyType: "hiphop_dancer", name: "Hip-Hop Dancer",
-      hp: cfg.hp || 40, atk: cfg.atk || 11, def: 2,
+      hp: cfg.hp || 46, atk: cfg.atk || 13, def: 2,
       aggroRange: 140, ai: "chase", expReward: 10
     });
     this._transformed = false; this._transformTimer = 0.5+Math.random()*0.5;
@@ -1107,7 +1107,7 @@ class ZingerBurgerClone extends Enemy {
       x: cfg.x, y: cfg.y, width: 18, height: 16,
       speed: 1.3, color: "#d4880a",
       enemyType: "zinger", name: "Zinger Burger",
-      hp: cfg.hp || 60, atk: cfg.atk || 12, def: cfg.def || 8,
+      hp: cfg.hp || 69, atk: cfg.atk || 14, def: cfg.def || 9,
       aggroRange: 160, ai: "chase", expReward: 15
     });
     this.isBoss = false;
@@ -1151,7 +1151,7 @@ class KFCKingBoss extends Enemy {
       x: cfg.x, y: cfg.y, width: 28, height: 32,
       speed: 1.0, color: "#fff",
       enemyType: "kfc_king", name: "Col. Sanders King Demon",
-      hp: cfg.hp || 500, atk: 15, def: 6,
+      hp: cfg.hp || 575, atk: 17, def: 7,
       aggroRange: 200, ai: "chase", expReward: 80
     });
     this.isBoss = true;
@@ -1166,7 +1166,7 @@ class KFCKingBoss extends Enemy {
     var pct = this.hp / this.maxHp;
     var p = this.game.localPlayer;
     if (pct <= 0.7 && this._phase === 1) {
-      this._phase = 2; this.atk = 20;
+      this._phase = 2; this.atk = 23;
       if (this.game.sound) this.game.sound.playBossPhaseUp();
       this.game.hud.addChatMessage("Colonel throws drumsticks! ATK UP!", "#f44");
     }
@@ -1178,7 +1178,7 @@ class KFCKingBoss extends Enemy {
       this.game.camera.shake(6, 0.5);
     }
     if (pct <= 0.25 && this._phase === 3 && !this._splitDone) {
-      this._phase = 4; this._splitDone = true; this.def = 12;
+      this._phase = 4; this._splitDone = true; this.def = 14;
       if (this.game.sound) this.game.sound.playBossPhaseUp();
       this.game.hud.addChatMessage("Splits into 5 ZINGER BURGERS! DEF UP!", "#f0d060");
       if (this.game.sound) { this.game.sound.stopBGM(); this.game.sound.playBGM("kfc_final"); this.game.sound.playKFCJingle(); }
@@ -1186,7 +1186,7 @@ class KFCKingBoss extends Enemy {
         var angle = (Math.PI*2/5)*i;
         var z = new ZingerBurgerClone(this.game, {
           x: this.x+Math.cos(angle)*40, y: this.y+Math.sin(angle)*40,
-          hp: 60, atk: 12, def: 8, parentBoss: this
+          hp: 69, atk: 14, def: 9, parentBoss: this
         });
         this._zingers.push(z); this.game.addEntity(z);
       }
@@ -1405,7 +1405,7 @@ class Stage2_1F {
       { speaker: "Col. Sanders", text: "Time to fry YOU up!" }
     ], function() {
       var boss = new KFCKingBoss(game, {
-        x: 28*16, y: 10*16, hp: 500,
+        x: 28*16, y: 10*16, hp: 575,
         onDefeat: function() {
           self._showElevator();
         }

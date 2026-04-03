@@ -3,6 +3,7 @@ _loadSub(game,sub){
   this.game=game;
   game.entities=game.entities.filter(e=>e instanceof Player);
   game._currentSubName=sub;
+  game._notifyStageChange("s1_"+sub);
   if(sub==="sub1"){
     this.currentSub=new Stage1_Sub1((next)=>{if(game.sound)game.sound.increaseTempo(1.07);this._loadSub(this.game,next)});
     this.currentSub.init(game);
@@ -16,7 +17,7 @@ _loadSub(game,sub){
     this.currentSub=new Stage1_Sub4((next)=>{
       if(next==="stage2"){
         if(game.sound)game.sound.stopBGM();
-        game.transition.startFade(()=>{game.loadStage(new Stage2())},()=>{});
+        game.transition.startFade(()=>{game._notifyStageChange("s2_b2");game.loadStage(new Stage2())},()=>{});
       }
     });
     this.currentSub.init(game);

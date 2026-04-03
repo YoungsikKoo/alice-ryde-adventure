@@ -17,6 +17,7 @@ class Stage2{
     this.game=game;
     game.entities=game.entities.filter(e=>e instanceof Player);
     game._currentSubName=sub;
+    game._notifyStageChange("s2_"+sub);
     if(sub==="b2"){
       this.currentSub=new Stage2_B2((next)=>{
         this._loadSub(game,"b1");
@@ -45,6 +46,7 @@ class Stage2{
       this.currentSub=new Stage2_3F((next)=>{
         if(game.sound)game.sound.stopBGM();
         this.complete=true;
+        game._notifyStageChange("s3");
         game.loadStage(new Stage3());
       });
       this.currentSub.init(game);

@@ -5,8 +5,8 @@
 
    Zones (proximity-triggered):
      1. Treadmill Zone   → 3 Treadmill Zombies
-     2. Yoga Studio      → 5 Yoga Rollers (Indian BGM)
-     3. Spinning Room    → 4 Spinning Cyclists
+     2. Yoga Studio      → 6 Yoga Rollers (Indian BGM)
+     3. Spinning Room    → 3 Spin Bikes + 3 Cyclists (6 total)
      4. Bench Press Area → 3 Bench Press Strongmen
      5. Swimming Pool    → 5 Dolphins + Whirlpool drain
 
@@ -25,9 +25,9 @@ class GymMachine extends Enemy {
       speed: 0, color: cfg.color || "#444",
       enemyType: "gymMachine",
       name: cfg.name || "Gym Equipment",
-      hp: cfg.hp || 60,
-      atk: 0, def: 3,
-      contactDamage: 3,
+      hp: cfg.hp || 72,
+      atk: 0, def: 4,
+      contactDamage: 4,
       ai: "stationary",
       aggroRange: 0,
       expReward: 12
@@ -100,7 +100,7 @@ class TreadmillMachine extends GymMachine {
   constructor(game, cfg) {
     super(game, Object.assign({
       name: "Treadmill", machineType: "treadmill", color: "#555",
-      hp: 60, label: "TREADMILL", triggerRange: 70
+      hp: 72, label: "TREADMILL", triggerRange: 70
     }, cfg));
   }
   update(dt) {
@@ -158,7 +158,7 @@ class TreadmillZombie extends Enemy {
       speed: 3.5, color: "#556b2f",
       enemyType: "treadmillZombie",
       name: "Treadmill Zombie",
-      hp: 35, atk: 9, def: 3,
+      hp: 42, atk: 11, def: 4,
       ai: "chase", aggroRange: 150,
       expReward: 8
     });
@@ -200,12 +200,12 @@ class TreadmillZombie extends Enemy {
   }
 }
 
-/* ========== 2. YOGA STUDIO (one big studio, 5 yoga students) ========== */
+/* ========== 2. YOGA STUDIO (one big studio, 6 yoga students) ========== */
 class YogaStudio extends GymMachine {
   constructor(game, cfg) {
     super(game, Object.assign({
       name: "Yoga Studio", machineType: "yoga", color: "#8b6fcf",
-      hp: 120, label: "YOGA STUDIO", w: 160, h: 96, triggerRange: 100
+      hp: 144, label: "YOGA STUDIO", w: 160, h: 96, triggerRange: 100
     }, cfg));
     this._students = [];
     this._onStudentDeath = cfg.onStudentDeath || null;
@@ -221,9 +221,9 @@ class YogaStudio extends GymMachine {
       if (this.game.sound) this.game.sound.playBGM("yoga_indian");
       var positions = [
         {x:this.x+20, y:this.y+20},{x:this.x+60, y:this.y+20},{x:this.x+100, y:this.y+20},
-        {x:this.x+40, y:this.y+60},{x:this.x+80, y:this.y+60}
+        {x:this.x+20, y:this.y+60},{x:this.x+60, y:this.y+60},{x:this.x+100, y:this.y+60}
       ];
-      for (var i=0; i<5; i++) {
+      for (var i=0; i<6; i++) {
         var s = new YogaStudent(this.game, { x:positions[i].x, y:positions[i].y });
         this.game.addEntity(s);
         this._students.push(s);
@@ -236,7 +236,7 @@ class YogaStudio extends GymMachine {
     ctx.fillRect(sp.x, sp.y, 160, 96);
     // Mat outlines
     ctx.strokeStyle = "rgba(255,255,255,0.15)"; ctx.lineWidth = 1;
-    for (var i=0; i<5; i++) {
+    for (var i=0; i<6; i++) {
       var mx = sp.x+10+(i%3)*50, my = sp.y+8+Math.floor(i/3)*48;
       ctx.strokeRect(mx, my, 30, 40);
     }
@@ -262,7 +262,7 @@ class YogaStudent extends Enemy {
       speed: 0, color: "#9b59b6",
       enemyType: "yogaStudent",
       name: "Yoga Student",
-      hp: 30, atk: 7, def: 2,
+      hp: 36, atk: 8, def: 2,
       ai: "stationary", aggroRange: 0,
       expReward: 6
     });
@@ -411,7 +411,7 @@ class SpinBike extends GymMachine {
   constructor(game, cfg) {
     super(game, Object.assign({
       name: "Spin Bike", machineType: "spinning", color: "#e67e22",
-      hp: 55, label: "SPIN BIKE", w: 28, h: 32, triggerRange: 65
+      hp: 66, label: "SPIN BIKE", w: 28, h: 32, triggerRange: 65
     }, cfg));
   }
   update(dt) {
@@ -499,7 +499,7 @@ class SpinCyclist extends Enemy {
       speed: 3.0, color: "#e67e22",
       enemyType: "spinCyclist",
       name: "Spin Cyclist",
-      hp: 30, atk: 8, def: 3,
+      hp: 36, atk: 10, def: 4,
       ai: "chase", aggroRange: 140,
       expReward: 7
     });
@@ -551,7 +551,7 @@ class BenchPressStation extends GymMachine {
   constructor(game, cfg) {
     super(game, Object.assign({
       name: "Bench Press", machineType: "benchPress", color: "#c0392b",
-      hp: 80, label: "BENCH PRESS", w: 48, h: 36, triggerRange: 70
+      hp: 96, label: "BENCH PRESS", w: 48, h: 36, triggerRange: 70
     }, cfg));
   }
   update(dt) {
@@ -600,7 +600,7 @@ class BenchStrongman extends Enemy {
       speed: 1.4, color: "#c0392b",
       enemyType: "benchStrongman",
       name: "Strongman",
-      hp: 50, atk: 12, def: 6,
+      hp: 60, atk: 14, def: 7,
       ai: "chase", aggroRange: 130,
       expReward: 10
     });
@@ -664,7 +664,7 @@ class BarbellProjectile extends Entity {
     });
     this._dirX = cfg.dirX; this._dirY = cfg.dirY;
     this._age = 0; this._lifetime = 4;
-    this.contactDamage = 20;
+    this.contactDamage = 24;
     this._spin = 0;
   }
   update(dt) {
@@ -703,7 +703,7 @@ class BigPool extends GymMachine {
   constructor(game, cfg) {
     super(game, Object.assign({
       name: "Swimming Pool", machineType: "pool", color: "#3498db",
-      hp: 150, label: "SWIMMING POOL", w: 240, h: 112, triggerRange: 120
+      hp: 180, label: "SWIMMING POOL", w: 240, h: 112, triggerRange: 120
     }, cfg));
     this._dolphins = [];
     this._whirlpoolActive = false;
@@ -793,7 +793,7 @@ class PoolDolphin extends Enemy {
       speed: 2.2, color: "#3498db",
       enemyType: "poolDolphin",
       name: "Pool Dolphin",
-      hp: 28, atk: 9, def: 3,
+      hp: 34, atk: 11, def: 4,
       ai: "chase", aggroRange: 130,
       expReward: 6
     });
@@ -903,7 +903,7 @@ class AerobicsKingBoss extends Enemy {
       speed: 2.0, color: "#ff1493",
       enemyType: "aerobicsKing",
       name: "Aerobics King",
-      hp: 200, atk: 15, def: 6,
+      hp: 240, atk: 18, def: 7,
       ai: "chase", aggroRange: 300,
       expReward: 100
     });
@@ -1140,7 +1140,7 @@ class AerobicStudent extends Enemy {
       speed: 4.0, color: "#ff69b4",
       enemyType: "aerobicStudent",
       name: "Aerobic Student",
-      hp: 15, atk: 5, def: 1,
+      hp: 18, atk: 6, def: 1,
       ai: "chase", aggroRange: 200,
       expReward: 4
     });
@@ -1324,7 +1324,7 @@ class Stage2_2F {
       self._machines.push(tm);
     }
 
-    // ---- ZONE 2: 1 Yoga Studio (big studio, spawns 5 yoga students) ----
+    // ---- ZONE 2: 1 Yoga Studio (big studio, spawns 6 yoga students) ----
     var yogaStudio = new YogaStudio(game, {
       x: 39*16, y: 11*16,
       onDestroy: onMachineDestroy
@@ -1332,12 +1332,11 @@ class Stage2_2F {
     game.addEntity(yogaStudio);
     self._machines.push(yogaStudio);
 
-    // ---- ZONE 3: 4 Spin Bikes (inside spinning room, 2x2 grid) ----
+    // ---- ZONE 3: 3 Spin Bikes (inside spinning room, each spawns 1 cyclist = 6 total) ----
     var spinPositions = [
       { x: 22*16, y: 12*16 },
       { x: 26*16, y: 12*16 },
-      { x: 30*16, y: 12*16 },
-      { x: 26*16, y: 16*16 }
+      { x: 30*16, y: 12*16 }
     ];
     for (var si = 0; si < spinPositions.length; si++) {
       var sb = new SpinBike(game, {

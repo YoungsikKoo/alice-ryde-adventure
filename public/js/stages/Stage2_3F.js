@@ -116,7 +116,7 @@ class RomanceMob extends Enemy {
     super(game, {
       x:cfg.x, y:cfg.y, width:20, height:24, speed:1.2, color:"#ff69b4",
       enemyType:"romanceMob", name: cfg.gender==="m" ? "Romeo" : "Juliet",
-      hp:30, atk:6, def:2, contactDamage:8, ai:"chase", aggroRange:120, expReward:6
+      hp:38, atk:8, def:3, contactDamage:10, ai:"chase", aggroRange:120, expReward:6
     });
     this.aggroed = false;
     this._gender = cfg.gender || "f";
@@ -320,7 +320,7 @@ class WarSoldier extends Enemy {
     super(game, {
       x:cfg.x, y:cfg.y, width:20, height:26, speed:0.9, color:"#556b2f",
       enemyType:"warSoldier", name:"Soldier",
-      hp:40, atk:10, def:4, contactDamage:12, ai:"chase", aggroRange:160, expReward:8
+      hp:50, atk:13, def:5, contactDamage:15, ai:"chase", aggroRange:160, expReward:8
     });
     this.aggroed = false;
     this._age = 0;
@@ -574,7 +574,7 @@ class ZombieViewer extends Enemy {
     super(game, {
       x:cfg.x, y:cfg.y, width:20, height:26, speed:0, color:"#7a7",
       enemyType:"zombieViewer", name:"Zombie",
-      hp:35, atk:9, def:3, contactDamage:13, ai:"stationary", aggroRange:0, expReward:7
+      hp:44, atk:11, def:4, contactDamage:16, ai:"stationary", aggroRange:0, expReward:7
     });
     this._age = 0;
     this._transformed = false;
@@ -724,7 +724,7 @@ class MathMonster extends Enemy {
     super(game, {
       x:cfg.x, y:cfg.y, width:22, height:26, speed:2.72, color:"#a0f",
       enemyType:"mathMonster", name:cfg.name||"Math Monster",
-      hp:45, atk:11, def:4, contactDamage:14, ai:"chase", aggroRange:400, expReward:9
+      hp:56, atk:14, def:5, contactDamage:18, ai:"chase", aggroRange:400, expReward:9
     });
     this.aggroed = true;
     this._age = 0;
@@ -879,11 +879,11 @@ class MissKumarwitch extends Enemy {
     super(game, {
       x:cfg.x, y:cfg.y, width:36, height:40, speed:1.8, color:"#800080",
       enemyType:"kumarwitch", name:"Miss Kumarwitch",
-      hp:300, atk:18, def:10, contactDamage:20, ai:"chase", aggroRange:350, expReward:200
+      hp:375, atk:23, def:13, contactDamage:25, ai:"chase", aggroRange:350, expReward:200
     });
     this.aggroed = false; // Starts idle, activated by dialogue
     this._age = 0;
-    this._originalMaxHp = 300;
+    this._originalMaxHp = 375;
     this._scaleLevel = 0; // grows each 15% HP lost
     this._lastHpThreshold = 1.0;
     this._attackTimer = 0;
