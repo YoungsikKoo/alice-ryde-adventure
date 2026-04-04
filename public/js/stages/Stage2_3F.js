@@ -584,8 +584,8 @@ class ZombieViewer extends Enemy {
     this._vomitTimer = 0;
     this._isVomiting = false;
     this._deathMsgs = [
-      "Ah jinja억울해","Ugh...restore해줘","Eommaaaaaa","Na wonrae ireon character anim",
-      "Ireolgeomyeon wae buhwalsikyeosseo","Ah...oneul condition byeollo","Na ajik daesa안끝남",
+      "So unfair...","Ugh...restore me","Mommmyyy","I'm not usually like this",
+      "Why did you revive me for this","Ugh...not feeling it today","My lines aren't done yet",
       "Not like this...","Ew, rude.","Why me though...","Okay, embarrassing.",
       "Yeah nah, I'm done.","This is not cute.","Mate, tragic.",
       "I hate this for me.","So unfair...","Actually rude."
@@ -879,7 +879,7 @@ class MissKumarwitch extends Enemy {
     super(game, {
       x:cfg.x, y:cfg.y, width:36, height:40, speed:1.8, color:"#800080",
       enemyType:"kumarwitch", name:"Miss Kumarwitch",
-      hp:375, atk:29, def:16, contactDamage:25, ai:"chase", aggroRange:350, expReward:200
+      hp:375, atk:40, def:16, contactDamage:45, ai:"chase", aggroRange:350, expReward:200
     });
     this.aggroed = false; // Starts idle, activated by dialogue
     this._age = 0;
@@ -913,7 +913,8 @@ class MissKumarwitch extends Enemy {
     this._hitCount = (this._hitCount || 0) + 1;
     this.width = Math.floor(36 * (1 + this._hitCount * 0.1));
     this.height = Math.floor(40 * (1 + this._hitCount * 0.1));
-    this.atk = Math.floor(29 * (1 + this._hitCount * 0.1));
+    this.atk = Math.floor(40 * (1 + this._hitCount * 0.1));
+    this.contactDamage = Math.floor(45 * (1 + this._hitCount * 0.1));
     this.def = Math.floor(16 * (1 + this._hitCount * 0.05));
     if (this._hitCount % 3 === 0) {
       this.game.addEntity(new CinemaHealthPill(this.game, { x:this.x+20, y:this.y+30, heal:25 }));
@@ -1214,7 +1215,7 @@ class Stage2_3F {
 
     if (game.sound) { game.sound.stopBGM(); game.sound.resetTempo(); }
 
-    game.hud.showStageName("3F - EVENT CINEMA");
+    game.hud.showStageName("Stage 2-3F: Top Ryde City - Event Cinema");
     game.hud.addChatMessage("Welcome to Event Cinema! 4 screenings await...", "#50c878");
     game.hud.addChatMessage("Cinema 1 is OPEN! Enter through the lobby.", "#88bbff");
 

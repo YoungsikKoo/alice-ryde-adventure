@@ -33,8 +33,8 @@ class IntroScreen{
       {name:"Mom",type:"mom",color:"#e8c098",attackStyle:"punch",
        desc:["Korean mother","Kind & powerful","High HP, high atk"],
        stats:{hp:130,atk:12,def:6,speed:1.9}},
-      {name:"FaFa",type:"fafa",color:"#f0d060",attackStyle:"kick",
-       desc:["Korean grandpa","Wise & tough","Highest def, slow"],
+      {name:"Rocky",type:"rocky",color:"#f0d060",attackStyle:"kick",
+       desc:["Korean father","Wise & tough","Highest def, slow"],
        stats:{hp:120,atk:8,def:9,speed:1.8}}
     ];
   }

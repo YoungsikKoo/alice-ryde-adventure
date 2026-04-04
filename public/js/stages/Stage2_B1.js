@@ -1,7 +1,7 @@
 /* ================================================================
    Stage 2 - B1: Woolworths "Wool-WORSE" Supermarket (Side-Scroll)
    16-bit 256-color style. Mobs: fruit-stealing rats, zombie guards.
-   Boss: KAREN THE TERRIBLE (진상고객)
+   Boss: KAREN THE TERRIBLE (nightmare customer)
 
    Boss phases:
      100-70%  Yells insults + throws shopping items
@@ -617,7 +617,7 @@ class Stage2_B1 {
     p.svx = 0; p.svy = 0;
     game.camera.x = 0; game.camera.y = 0;
     game.camera.follow(p);
-    game.hud.showStageName("~ Stage 2 - B1: Wool-WORSE Supermarket ~");
+    game.hud.showStageName("Stage 2-B1: Top Ryde City - Woolworths");
     game.hud.addChatMessage("Welcome to Wool-WORSE! Where the prices are SCARY!", "#2a8a2a");
     this._spawnEnemies();
     this._spawnItems();

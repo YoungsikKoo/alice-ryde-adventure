@@ -9,6 +9,8 @@ class Game{constructor(canvasId){this.canvas=document.getElementById(canvasId);t
   if(this.input.justPressed["shift+8"]){this._cheatLoadStage2("2f");}
   if(this.input.justPressed["shift+9"]){this._cheatLoadStage2("3f");}
   if(this.input.justPressed["shift+0"]){this._cheatLoadStage3();}
+  if(this.input.justPressed["shift+q"]){this._cheatLoadStage3Sub("senior1f");}
+  if(this.input.justPressed["shift+w"]){this._cheatLoadStage3Sub("senior2f");}
   if(this.input.justPressed["t"]&&this.network&&this.network.connected){var chatText=prompt("Chat:");if(chatText&&chatText.trim()){this.network.sendChat(chatText.trim());this.hud.addChatMessage(this.localPlayer.name+": "+chatText.trim(),"#fff")}}
 }for(let i=this.entities.length-1;i>=0;i--){this.entities[i].update(this.deltaTime);if(this.entities[i].destroyed)this.entities.splice(i,1)}this.combat.update(this.deltaTime);this.camera.update(this.deltaTime);this.hud.update(this.deltaTime);this.input.update()}render(){const ctx=this.renderer.begin();this.renderer.clear("#c0c0d0");if(this.state==="loading")return;if(this.state==="intro"&&this.introScreen){this.introScreen.render(ctx);this.renderer.end();return}if(this.currentStage&&this.currentStage.currentSub&&this.currentStage.currentSub.ss&&this.currentStage.currentSub.ss.active){this.currentStage.currentSub.render(ctx,this.camera)}else if(this.currentStage&&this.currentStage.ss&&this.currentStage.ss.active){this.currentStage.render(ctx,this.camera)}else{if(this.tileMap)this.tileMap.render(ctx,this.camera);if(this.currentStage&&this.currentStage.currentSub&&this.currentStage.currentSub.render&&(!this.currentStage.currentSub.ss||!this.currentStage.currentSub.ss.active))this.currentStage.currentSub.render(ctx,this.camera)};const sorted=[...this.entities].sort((a,b)=>a.y-b.y);for(const e of sorted)e.render(ctx,this.camera);this.combat.render(ctx,this.camera);this.hud.render(ctx);if(this.state==="dialogue")this.dialogue.render(ctx);if(this.transition&&this.transition.active)this.transition.render(ctx);this.renderer.renderFlash(this.deltaTime);this.renderer.end()}loadStage(stage){this.entities=this.entities.filter(e=>e instanceof Player);this.currentStage=stage;stage.init(this)}addEntity(e){this.entities.push(e)}removeEntity(e){e.destroyed=true}getEntitiesInRadius(x,y,r,filter){return this.entities.filter(e=>{if(filter&&!filter(e))return false;const dx=e.x-x,dy=e.y-y;return dx*dx+dy*dy<=r*r})}updateLoadingBar(pct,text){const b=document.getElementById("loading-bar"),t=document.getElementById("loading-text");if(b)b.style.width=pct+"%";if(t)t.textContent=text}_handleDeath(){
   if(this._respawning)return;
@@ -55,8 +57,8 @@ _coopRespawn(){
   p._needsRegroup=true;
   this._respawning=false;
   this.state="playing";
-  this.hud.addChatMessage("기다려줘~~~","#f0d060");
-  if(this.network&&this.network.connected){this.network.sendChat("기다려줘~~~")}
+  this.hud.addChatMessage("Wait for me~~~","#f0d060");
+  if(this.network&&this.network.connected){this.network.sendChat("Wait for me~~~")}
 }
 _doRespawn(){
   const stage=this.currentStage;
@@ -114,6 +116,22 @@ _cheatLoadStage3(){
   this.state="playing";
   this.loadStage(new Stage3());
   this._notifyStageChange("s3");
+}
+_cheatLoadStage3Sub(sub){
+  if(this.sound)this.sound.stopBGM();
+  this.tileMap=null;
+  var p=this.localPlayer;
+  p.sideScrollMode=false;p.svy=0;p.svx=0;p.vx=0;p.vy=0;
+  p.hp=p.maxHp;
+  p._webSlowed=false;p._poisoned=false;
+  if(p._origSpeed)p.speed=p._origSpeed;
+  p._origSpeed=null;
+  var s=new Stage3();
+  s.game=this;
+  this.currentStage=s;
+  this.entities=this.entities.filter(e=>e instanceof Player);
+  this.state="playing";
+  s._loadSub(this,sub||"senior1f");
 }
 _initNetwork(){this.network=new Network(this);this.network.connect();var self=this;var waitConn=setInterval(function(){if(self.network.connected){clearInterval(waitConn);self.network.sendJoin(self.localPlayer.name,self.localPlayer._spriteType,self.localPlayer._attackStyle,{hp:self.localPlayer.maxHp,atk:self.localPlayer.atk,def:self.localPlayer.def,speed:self.localPlayer.speed});self.network.startSending()}},100)}
 _notifyStageChange(name){this._currentStageName=name;if(this.network&&this.network.connected&&this.isHost){this.network.sendStageChange(name)}}

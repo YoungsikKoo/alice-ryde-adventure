@@ -140,7 +140,7 @@ class Stage1_Sub4{
     game.camera.x=p.x-240;
     game.camera.y=p.y-160;
 
-    game.hud.showStageName("~ Stage 1-4: Ryde Park ~");
+    game.hud.showStageName("Stage 1-4: Ryde Park");
     this._spawnEnemies();
     this._spawnItems();
     this._setupBoss();

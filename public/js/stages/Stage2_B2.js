@@ -213,7 +213,7 @@ class Stage2_B2 {
     p.svx = 0; p.svy = 0;
     game.camera.x = 0; game.camera.y = 0;
     game.camera.follow(p);
-    game.hud.showStageName("~ Stage 2 - B2: Underground Parking ~");
+    game.hud.showStageName("Stage 2-B2: Top Ryde City - Underground Parking");
     game.hud.addChatMessage("Watch out for cars! Fight the scorpions!", "#f0d060");
     this._spawnEnemies();
     this._spawnItems();

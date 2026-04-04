@@ -71,7 +71,11 @@ class Network {
     for (const data of msg.players) {
       if (data.id === this.myId) continue;
       let p = this.remotePlayers.get(data.id);
-      if (!p) continue;
+      if (!p) {
+        // Auto-create remote player if we missed the join message
+        p = this._createRemotePlayer(data);
+        if (!p) continue;
+      }
       p._remoteMoving = (data.x !== p.x || data.y !== p.y);
       p.x = data.x;
       p.y = data.y;
@@ -205,7 +209,7 @@ class Network {
   }
 
   _createRemotePlayer(data) {
-    if (this.remotePlayers.has(data.id)) return;
+    if (this.remotePlayers.has(data.id)) return this.remotePlayers.get(data.id);
     const p = new Player(this.game, {
       x: data.x || 240,
       y: data.y || 160,
@@ -253,6 +257,10 @@ class Network {
     p.sideScrollMode = false;
     p.vx = 0; p.vy = 0;
     if (p.svy !== undefined) p.svy = 0;
+    if (p.svx !== undefined) p.svx = 0;
+    p._webSlowed = false; p._glueSlowed = false; p._poisoned = false;
+    if (p._origSpeed) { p.speed = p._origSpeed; p._origSpeed = null; }
+    p.hp = p.maxHp; p.alive = true; p.alpha = 1;
     game.entities = game.entities.filter(e => e instanceof Player);
     game.state = "playing";
 
@@ -269,6 +277,12 @@ class Network {
       s.game = game;
       game.currentStage = s;
       s._loadSub(game, floor);
+    } else if (stageName.startsWith("s3_")) {
+      const sub = stageName.replace("s3_", "");
+      const s = new Stage3();
+      s.game = game;
+      game.currentStage = s;
+      s._loadSub(game, sub);
     } else if (stageName === "s3") {
       game.loadStage(new Stage3());
     } else {

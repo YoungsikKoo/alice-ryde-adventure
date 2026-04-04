@@ -1292,7 +1292,7 @@ class Stage2_2F {
     if (game.sound) { game.sound.stopBGM(); game.sound.resetTempo(); game.sound.playBGM("gym_2f"); }
 
     game.camera.setMapBounds(W*16, H*16);
-    game.hud.showStageName("2F - FITNESS FIRST GYM");
+    game.hud.showStageName("Stage 2-2F: Top Ryde City - Fitness First");
     game.hud.addChatMessage("Welcome to Fitness First! Destroy all 14 machines!", "#50c878");
     game.hud.addChatMessage("Get close to activate, then ATTACK!", "#88bbff");
 

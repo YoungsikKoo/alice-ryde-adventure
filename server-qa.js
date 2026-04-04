@@ -2,6 +2,7 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const { WebSocketServer } = require("ws");
+const { spawn } = require("child_process");
 
 const PORT = 8000;
 const PUB = path.join(__dirname, "public");
@@ -16,9 +17,77 @@ const MIME = {
   ".wav": "audio/wav"
 };
 
+/* ========== Cloudflare Tunnel Manager ========== */
+let tunnelProcess = null;
+let tunnelURL = null;
+let tunnelStarting = false;
+
+function startTunnel(callback) {
+  if (tunnelProcess) { callback(null, tunnelURL); return; }
+  if (tunnelStarting) { callback(null, null); return; }
+  tunnelStarting = true;
+  tunnelURL = null;
+  console.log("[TUNNEL] Starting cloudflared...");
+  const proc = spawn("/usr/local/bin/cloudflared", ["tunnel", "--url", "http://localhost:" + PORT], { stdio: ["ignore", "pipe", "pipe"] });
+  tunnelProcess = proc;
+  let output = "";
+  proc.stderr.on("data", (chunk) => {
+    output += chunk.toString();
+    var match = output.match(/https:\/\/[a-z0-9\-]+\.trycloudflare\.com/);
+    if (match && !tunnelURL) {
+      tunnelURL = match[0];
+      tunnelStarting = false;
+      console.log("[TUNNEL] URL: " + tunnelURL);
+      callback(null, tunnelURL);
+    }
+  });
+  proc.on("close", () => {
+    console.log("[TUNNEL] Process exited");
+    tunnelProcess = null;
+    tunnelURL = null;
+    tunnelStarting = false;
+  });
+  proc.on("error", (err) => {
+    console.log("[TUNNEL] Error: " + err.message);
+    tunnelProcess = null;
+    tunnelStarting = false;
+    callback(err.message, null);
+  });
+  // Timeout: if no URL after 15s
+  setTimeout(() => {
+    if (tunnelStarting) {
+      tunnelStarting = false;
+      if (!tunnelURL) callback("Tunnel timeout", null);
+    }
+  }, 15000);
+}
+
 /* ========== HTTP Static Server ========== */
 const server = http.createServer((req, res) => {
   let url = req.url.split("?")[0];
+
+  /* --- API: Start tunnel --- */
+  if (url === "/api/tunnel/start") {
+    res.writeHead(200, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
+    if (tunnelURL) {
+      res.end(JSON.stringify({ status: "running", url: tunnelURL }));
+      return;
+    }
+    startTunnel((err, turl) => {
+      if (err) res.end(JSON.stringify({ status: "error", error: err }));
+      else if (turl) res.end(JSON.stringify({ status: "running", url: turl }));
+      else res.end(JSON.stringify({ status: "starting" }));
+    });
+    return;
+  }
+
+  /* --- API: Tunnel status --- */
+  if (url === "/api/tunnel/status") {
+    res.writeHead(200, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
+    res.end(JSON.stringify({ status: tunnelURL ? "running" : "stopped", url: tunnelURL }));
+    return;
+  }
+
   if (url === "/") url = "/index.html";
   const filePath = path.join(PUB, url);
   if (!filePath.startsWith(PUB)) { res.writeHead(403); res.end(); return; }
@@ -159,7 +228,8 @@ setInterval(() => {
   for (const [id, p] of players) {
     if (!p.joined) continue;
     states.push({
-      id: p.id, x: p.x, y: p.y, direction: p.direction,
+      id: p.id, name: p.name, spriteType: p.spriteType, attackStyle: p.attackStyle,
+      x: p.x, y: p.y, direction: p.direction,
       attacking: p.attacking, hp: p.hp, maxHp: p.maxHp,
       level: p.level, invincible: p.invincible, alive: p.alive,
       stage: p.stage, sideScrollMode: p.sideScrollMode || false

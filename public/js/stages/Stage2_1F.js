@@ -1354,7 +1354,7 @@ class Stage2_1F {
     // BGM
     if (game.sound) { game.sound.stopBGM(); game.sound.resetTempo(); game.sound.playBGM("arcade_1f"); }
 
-    game.hud.showStageName("1F - GAME ZONE ARCADE");
+    game.hud.showStageName("Stage 2-1F: Top Ryde City - Game Zone Arcade");
     game.hud.addChatMessage("Welcome to the Arcade! Destroy all 7 machines!", "#50c878");
     game.hud.addChatMessage("Get close to activate, then ATTACK to destroy!", "#88bbff");
 
